@@ -10,7 +10,8 @@
     "spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git",
     "spinal-env-viewer-context-menu-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-menu-service.git",
     "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
-    "vue-async-computed": "^3.6.1"
+    "spinal-env-viewer-plugin-bimobjectservice": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-bimobjectservice.git",
+    "vue-color": "^2.7.0"
   },
   "keywords": [],
   "author": "",
