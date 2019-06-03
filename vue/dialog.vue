@@ -151,12 +151,23 @@ export default {
         return;
       }
 
-      selected = selected.map(el => {
-        return bimObjectService.createBIMObject(el, "bim");
-      });
+      window.spinal.ForgeViewer.viewer.model.getBulkProperties(
+        selected,
+        {
+          propFilter: ["name"]
+        },
+        res => {
+          res.forEach(el => {
+            this.createBimObjectNode(el);
+          });
+        }
+      );
+    },
 
-      Promise.all(selected).then(res => {
-        res.forEach(el => {
+    createBimObjectNode(bimElement) {
+      bimObjectService
+        .createBIMObject(bimElement.dbId, bimElement.name)
+        .then(el => {
           SpinalGraphService._addNode(el);
           groupService.linkElementToGroup(
             this.parent.id.get(),
@@ -164,9 +175,18 @@ export default {
             this.contextId
           );
         });
-      });
-    },
 
+      // Promise.all(selected).then(res => {
+      //   res.forEach(el => {
+      //     SpinalGraphService._addNode(el);
+      //     groupService.linkElementToGroup(
+      //       this.parent.id.get(),
+      //       el.info.id.get(),
+      //       this.contextId
+      //     );
+      //   });
+      // });
+    },
     addRooms() {
       console.log("add Rooms");
     },

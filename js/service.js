@@ -36,6 +36,8 @@ const typeLst = [
 ]
 
 
+
+
 const TYPE_AND_RELATION = new Map();
 
 TYPE_AND_RELATION.set(ROOMS_GROUP_CONTEXT, ROOMS_CATEGORY_RELATION)
@@ -172,6 +174,13 @@ let groupService = {
       default:
         return {};
     }
+  },
+  getElementsLinked(groupId) {
+    let type = SpinalGraphService.getInfo(groupId).type.get();
+    let relationName = type === ROOMS_GROUP ? ROOMS_TO_ELEMENT_RELATION :
+      EQUIPMENTS_TO_ELEMENT_RELATION;
+
+    return SpinalGraphService.getChildren(groupId, [relationName]);
   }
 };
 

@@ -1,207 +1,141 @@
+
 <template>
-  <md-dialog :md-active.sync="showDialog"
-             @md-closed="closeDialog(false)"
-             class="dialog">
-    <md-dialog-title class="title">Link</md-dialog-title>
+  <md-content class="md-scrollbar">
+    <div class="title headline">{{title}}</div>
+    <md-list v-if="data.length > 0">
+      <md-list-item class="listContainer"
+                    v-for="(item, index) in data"
+                    :key="index"
+                    @mouseover="eventMethod('mouseover',item)"
+                    @mouseleave="eventMethod('mouseleave',item)">
+        <span class="md-list-item-text">{{item.name}}</span>
+        <md-button class="md-icon-button"
+                   @click="linkUnlink(item)">
+          <md-icon>{{getIcon(item)}}</md-icon>
+        </md-button>
+      </md-list-item>
+    </md-list>
 
-    <md-dialog-content class="dialogContainer">
+    <div class="empty"
+         v-else>
+      No Data found !
+    </div>
 
-      <!-- <md-table v-model="searched"
-                class="table"
-                md-sort="name"
-                md-sort-order="asc"
-                md-fixed-header>
-        <md-table-toolbar class="md-layout md-gutter">
-
-          <div class="md-layout-item md-size-50">
-
-            <md-field>
-              <label for="floors">Filter By Floor</label>
-              <md-select v-model="floorsSelected"
-                         name="floors"
-                         id="floors"
-                         multiple>
-                <md-option value="fight-club">Fight Club</md-option>
-                <md-option value="godfather">Godfather</md-option>
-                <md-option value="godfather-ii">Godfather II</md-option>
-                <md-option value="godfather-iii">Godfather III</md-option>
-                <md-option value="godfellas">Godfellas</md-option>
-                <md-option value="pulp-fiction">Pulp Fiction</md-option>
-                <md-option value="scarface">Scarface</md-option>
-              </md-select>
-            </md-field>
-
-          </div>
-
-          <div class="md-layout-item md-size-50">
-
-            <md-field md-clearable>
-              <md-input placeholder="Search by name..."
-                        v-model="search"
-                        @input="searchOnTable" />
-            </md-field>
-
-          </div>
-        </md-table-toolbar>
-
-        <md-table-empty-state md-label="No Items found"></md-table-empty-state>
-
-        <md-table-row slot="md-table-row"
-                      slot-scope="{ item }">
-
-          <md-table-cell md-label="Name"
-                         md-sort-by="name">
-          </md-table-cell>
-
-        </md-table-row>
-
-
-      </md-table> -->
-
-      <table-component @filter="searchOnTable"
-                       :searched="searched"
-                       :groups="groups"
-                       :contextId="contextId"></table-component>
-
-    </md-dialog-content>
-
-    <md-dialog-actions>
-      <md-button class="md-primary"
-                 @click="closeDialog(false)">Close</md-button>
-      <!-- <md-button class="md-primary"
-                 @click="closeDialog(true)">Save</md-button> -->
-    </md-dialog-actions>
-  </md-dialog>
-
+  </md-content>
 </template>
 
 <script>
-import { groupService, ROOMS_GROUP_CONTEXT } from "../js/service";
-import tableComponent from "./tableComponent.vue";
-import { Lst } from "spinal-core-connectorjs_type";
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-import geographicService from "spinal-env-viewer-context-geographic-service";
+import { groupService, ROOMS_GROUP } from "../js/service";
+const {
+  spinalPanelManagerService
+} = require("spinal-env-viewer-panel-manager-service");
+
+import EventBus from "../js/event";
 
 export default {
-  name: "linkRoomDialog",
-  props: ["onFinised"],
-  components: {
-    "table-component": tableComponent
-  },
+  name: "linkPanelContent",
   data() {
-    this.contextId = null;
+    this.contextId;
+    this.groupId;
     return {
-      showDialog: true,
-      inputValue: "",
-      // search: null,
-      searched: [],
-      groups: [],
-      elements: [],
-      allData: []
+      title: "",
+      data: [],
+      dataLinked: []
     };
   },
   methods: {
-    opened(option) {
-      option.then(res => {
-        if (res) {
-          this.groups = new Lst(res.groups).get();
-          this.elements = new Lst(res.elements).get();
-          this.searched = new Lst(res.elements).get();
-          this.contextId = res.contextId;
+    async opened(option) {
+      this.contextId = option.contextId;
+      this.groupId = option.nodeId;
 
-          this.allData = this.getList(this.groups, this.elements);
+      this.title =
+        "Link " + (option.type === ROOMS_GROUP ? "Rooms" : "BimObject");
+      this.setTitle(this.title);
+      let refContext = SpinalGraphService.getContext(option.reference.context);
+
+      if (typeof refContext === "undefined") {
+        this.data = [];
+        this.dataLinked = [];
+        return;
+      }
+
+      let refContextId = refContext.info.id.get();
+      this.data = await this.getData(refContextId, option.reference.relation);
+      this.dataLinked = await this.getDataLinked(option.nodeId);
+    },
+
+    getData(parentId, relationName) {
+      return SpinalGraphService.getChildren(parentId, relationName).then(
+        res => {
+          return res.map(el => el.get());
         }
+      );
+    },
+    getDataLinked(id) {
+      return groupService.getElementsLinked(id).then(res => {
+        return res.map(el => el.get());
       });
     },
-
-    removed() {
-      this.showDialog = false;
+    setTitle(title) {
+      spinalPanelManagerService.panels.linkRoomPanel.panel.setTitle(title);
     },
-    closeDialog(closeResult) {
-      if (typeof this.onFinised === "function") {
-        this.onFinised(closeResult);
+    isLinked(item) {
+      return this.dataLinked.find(el => {
+        return item.id === el.id;
+      });
+    },
+    getIcon(item) {
+      return typeof this.isLinked(item) === "undefined" ? "link" : "link_off";
+    },
+    deleteItem(item) {
+      for (let i = 0; i < this.dataLinked.length; i++) {
+        const element = this.dataLinked[i];
+        if (element.id === item.item) {
+          this.dataLinked.splice(i, 1);
+          return;
+        }
       }
     },
-    searchOnTable(params) {
-      this.filterByFloor(params.floorsSelected).then(res => {
-        if (params.search && params.search.trim().length > 0) {
-          this.searched = res.filter(el => {
-            return el.name.toLowerCase().includes(params.search.toLowerCase());
-          });
-        } else {
-          this.searched = res;
-        }
-      });
-    },
-
-    filterByFloor(floorsIds) {
-      if (floorsIds.length === 0) {
-        return Promise.resolve(this.elements);
+    linkUnlink(item) {
+      if (this.isLinked(item)) {
+        this.deleteItem(item);
+        groupService.removeLink(this.groupId, item.id);
       } else {
-        let promises = [];
-        let contextType = SpinalGraphService.getInfo(this.contextId).type.get();
-
-        let type =
-          contextType === ROOMS_GROUP_CONTEXT
-            ? geographicService.constants.ROOM_TYPE
-            : geographicService.constants.EQUIPMENT_TYPE;
-
-        for (let index = 0; index < floorsIds.length; index++) {
-          const id = floorsIds[index];
-          promises.push(
-            SpinalGraphService.findNodes(
-              id,
-              geographicService.constants.GEOGRAPHIC_RELATIONS,
-              node => {
-                return node.info.type.get() === type;
-              }
-            )
-          );
-        }
-
-        return Promise.all(promises).then(el => {
-          let res = [];
-          for (let found of el) {
-            let foundInfo = found.map(x => x.info);
-            res.push(...foundInfo);
-          }
-          return new Lst(res).get();
-        });
+        this.dataLinked.push(item);
+        groupService.linkElementToGroup(this.groupId, item.id, this.contextId);
       }
     },
-
-    getList(groups, elements) {
-      let res = [];
-
-      elements.forEach(element => {
-        let obj = [element.name];
-
-        groups.forEach(async group => {
-          obj.push(
-            await groupService.elementIsLinkedToGroup(group.id, element.id)
-          );
-        });
-        res.push(obj);
-      });
-      return res;
+    eventMethod(eventName, item) {
+      EventBus.$emit(eventName, item);
     }
   }
 };
 </script>
 
 <style scoped>
-.dialog {
-  width: calc(80%);
-  height: 60%;
-}
-
-.dialog .title {
+.title {
   text-align: center;
-  font-size: 18px;
 }
 
-.dialog .table {
+.empty {
   width: 100%;
-  height: 100%;
+  height: 200px;
+  font-size: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
 }
 </style>
+
+
+<style>
+.listContainer .md-list-item-content {
+  padding-left: 5px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+</style>
+
+

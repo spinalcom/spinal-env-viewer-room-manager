@@ -1,4 +1,6 @@
 import "./js/registerDialogs";
+import "./js/event";
+
 import ContextGroupBtn from "./buttons/createContextGroup";
 import CreateElement from "./buttons/createElement";
 // import DisplayBimObjects from "./buttons/displayBimObject";

@@ -6,7 +6,8 @@ import {
   SpinalGraphService
 } from "spinal-env-viewer-graph-service";
 
-
+import bimObjectService from "spinal-env-viewer-plugin-bimobjectservice";
+import geographicService from "spinal-env-viewer-context-geographic-service"
 
 let ItemColoredMap = new Map();
 
@@ -15,14 +16,24 @@ let utilities = {
 
   getIcon(selectedNode, contextNode) {
     if (!this._display) return Promise.reject();
-
-
-    console.log(this._isColored(selectedNode));
+    console.log(selectedNode, contextNode);
     return Promise.resolve()
   },
 
 
+  getBimObjects(nodeId) {
 
+    let nodeType = SpinalGraphService.getInfo(nodeId);
+
+    if (nodeType.type.get() === bimObjectService.constants
+      .BIM_OBJECT_NODE_TYPE) {
+      return Promise.resolve([nodeType]);
+    }
+
+    return SpinalGraphService.getChildren(nodeId, [geographicService.constants
+      .REFERENCE_RELATION, geographicService.constants.EQUIPMENT_RELATION
+    ]);
+  },
 
 
 
@@ -66,7 +77,6 @@ let utilities = {
 
     for (let i = 0; i < nodes.length; i++) {
       const element = nodes[i];
-      console.log(element);
     }
 
     // let children = await SpinalGraphService.getChildren(nodeId, [
