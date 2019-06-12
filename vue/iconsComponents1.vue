@@ -50,8 +50,6 @@ export default {
     this.allIcons = Object.keys(allIcons);
     // this.categories = this.getAllCategories();
 
-    console.log("allIcons", this.allIcons);
-
     return {
       iconsDisplayed: Object.keys(allIcons),
       iconSelected: null

@@ -1,6 +1,4 @@
 import {
-  typeLst,
-  TYPE_AND_RELATION,
   ROOMS_CATEGORY_RELATION,
   ROOMS_GROUP_RELATION,
   ROOMS_TO_ELEMENT_RELATION,
@@ -223,6 +221,8 @@ let utilities = {
 
   _isColored(selectedNode) {
     return this.getGroups(selectedNode).then(res => {
+
+      if (res.length === 0) return false;
 
       for (let index = 0; index < res.length; index++) {
         const id = res[index].id.get();

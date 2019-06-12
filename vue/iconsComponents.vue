@@ -6,8 +6,9 @@
       <div class="select">
         <md-field>
           <label for="category">Category</label>
+
+          <!-- @md-selected="filterIcons" -->
           <md-select v-model="categorySelected"
-                     @md-selected="filterIcons"
                      name="category"
                      id="category"
                      md-dense>
@@ -87,6 +88,11 @@ export default {
 
     isSelected(icon) {
       return this.iconSelected === icon;
+    }
+  },
+  watch: {
+    categorySelected: function() {
+      this.filterIcons();
     }
   }
 };

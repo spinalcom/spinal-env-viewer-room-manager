@@ -1,6 +1,5 @@
 import {
-  SPINAL_RELATION_LST_PTR_TYPE,
-  SPINAL_RELATION_TYPE,
+  SPINAL_RELATION_PTR_LST_TYPE,
   SpinalGraphService
 } from "spinal-env-viewer-graph-service";
 
@@ -96,7 +95,7 @@ let groupService = {
         childId,
         contextId,
         relationName,
-        SPINAL_RELATION_TYPE
+        SPINAL_RELATION_PTR_LST_TYPE
       );
     }
 
@@ -132,7 +131,7 @@ let groupService = {
       EQUIPMENTS_TO_ELEMENT_RELATION;
 
     return SpinalGraphService.addChildInContext(groupId, elementId, contextId,
-      relationName, SPINAL_RELATION_LST_PTR_TYPE);
+      relationName, SPINAL_RELATION_PTR_LST_TYPE);
   },
   removeLink(groupId, elementId) {
     let type = SpinalGraphService.getInfo(groupId).type.get();
@@ -140,7 +139,7 @@ let groupService = {
       EQUIPMENTS_TO_ELEMENT_RELATION;
 
     return SpinalGraphService.removeChild(groupId, elementId, relationName,
-      SPINAL_RELATION_LST_PTR_TYPE)
+      SPINAL_RELATION_PTR_LST_TYPE)
   },
   getTypeAndRelation(elementType) {
 

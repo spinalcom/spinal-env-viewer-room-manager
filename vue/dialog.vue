@@ -59,6 +59,8 @@ import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 
 import iconComponent from "./iconsComponents.vue";
 
+import { bimObjectManagerService } from "spinal-env-viewer-bim-manager-service";
+
 // const viewer = window.spinal.ForgeViewer.viewer;
 
 export default {
@@ -151,8 +153,19 @@ export default {
         return;
       }
 
+      let tempSelected = [];
+
+      selected.forEach(el => {
+        tempSelected.push(
+          ...bimObjectManagerService.getLeafDbIds(
+            window.spinal.ForgeViewer.viewer.model,
+            el
+          )
+        );
+      });
+
       window.spinal.ForgeViewer.viewer.model.getBulkProperties(
-        selected,
+        tempSelected,
         {
           propFilter: ["name"]
         },
@@ -187,9 +200,7 @@ export default {
       //   });
       // });
     },
-    addRooms() {
-      console.log("add Rooms");
-    },
+    addRooms() {},
     isCategory() {
       let type;
 

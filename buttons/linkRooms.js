@@ -8,15 +8,17 @@ import {
 import {
   ROOMS_GROUP_CONTEXT,
   EQUIPMENTS_GROUP_CONTEXT,
-  ROOMS_GROUP_RELATION,
-  EQUIPMENTS_GROUP_RELATION,
   ROOMS_GROUP,
-  EQUIPMENTS_GROUP,
-  groupService
+  EQUIPMENTS_GROUP
 } from "../js/service";
-import {
-  SpinalGraphService
-} from "spinal-env-viewer-graph-service";
+
+
+
+// import {
+//   SpinalGraphService
+// } from "spinal-env-viewer-graph-service";
+
+
 
 import geographicService from "spinal-env-viewer-context-geographic-service";
 import bimobjectservice from "spinal-env-viewer-plugin-bimobjectservice";
@@ -94,25 +96,25 @@ let getParameter = (contextId, nodeId, nodeType) => {
   }
 }
 
-let getParameter2 = (
-  selectedContextId,
-  selectedContextRelation,
-  refContextName,
-  refContextRelation
-) => {
-  let context = SpinalGraphService.getContext(refContextName);
-  return SpinalGraphService.getChildren(selectedContextId, [
-    selectedContextRelation
-  ]).then(async res => {
-    return {
-      contextId: selectedContextId,
-      groups: res,
-      elements: context ?
-        await SpinalGraphService.getChildren(context.info.id.get(), [
-          refContextRelation
-        ]) : []
-    };
-  });
-};
+// let getParameter2 = (
+//   selectedContextId,
+//   selectedContextRelation,
+//   refContextName,
+//   refContextRelation
+// ) => {
+//   let context = SpinalGraphService.getContext(refContextName);
+//   return SpinalGraphService.getChildren(selectedContextId, [
+//     selectedContextRelation
+//   ]).then(async res => {
+//     return {
+//       contextId: selectedContextId,
+//       groups: res,
+//       elements: context ?
+//         await SpinalGraphService.getChildren(context.info.id.get(), [
+//           refContextRelation
+//         ]) : []
+//     };
+//   });
+// };
 
 export default LinkRooms;

@@ -11,6 +11,7 @@
     "spinal-env-viewer-context-menu-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-menu-service.git",
     "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
     "spinal-env-viewer-plugin-bimobjectservice": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-bimobjectservice.git",
+    "spinal-env-viewer-bim-manager-service": "https://github.com/spinalcom/spinal-env-viewer-bim-manager-service.git",
     "vue-color": "^2.7.0"
   },
   "keywords": [],

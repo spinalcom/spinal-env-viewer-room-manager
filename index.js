@@ -18,9 +18,33 @@ const SIDEBAR = "GraphManagerSideBar";
 const HEADERBAR = "GraphManagerTopBar";
 
 
+
 spinalContextMenuService.registerApp(HEADERBAR, new ContextGroupBtn());
 spinalContextMenuService.registerApp(SIDEBAR, new CreateElement());
 spinalContextMenuService.registerApp(SIDEBAR, new ViewChildren());
 spinalContextMenuService.registerApp(SIDEBAR, new ColorConfig());
 spinalContextMenuService.registerApp(SIDEBAR, new LinkRooms());
 spinalContextMenuService.registerApp(SIDEBAR, new AddToReference());
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//                                     TESTS                                                   //
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+import {
+  bimObjectManagerService
+} from "../spinal-env-viewer-bim-manager-service";
+
+// import AddBtnFunction from "../spinal-env-viewer-plugin-filter";
+
+window.tests = {
+  bimObjectManagerService: bimObjectManagerService,
+}
+
+
+// document.onreadystatechange = () => {
+//   console.log("state", document.readyState)
+//   if (document.readyState === 'complete') {
+//     AddBtnFunction();
+//   }
+// }

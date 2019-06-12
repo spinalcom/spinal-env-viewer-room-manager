@@ -1,22 +1,65 @@
 
 <template>
-  <md-content class="md-scrollbar">
-    <div class="title headline">{{title}}</div>
-    <md-list v-if="data.length > 0">
-      <md-list-item class="listContainer"
-                    v-for="(item, index) in data"
-                    :key="index"
-                    @mouseover="eventMethod('mouseover',item)"
-                    @mouseleave="eventMethod('mouseleave',item)">
-        <span class="md-list-item-text">{{item.name}}</span>
-        <md-button class="md-icon-button"
-                   @click="linkUnlink(item)">
-          <md-icon>{{getIcon(item)}}</md-icon>
-        </md-button>
-      </md-list-item>
-    </md-list>
+  <md-content class="mdContent">
+    <div class="header">
+      <!-- <md-field class="search md-inline">
+        <label>Voice</label>
+        <md-input v-model="voice"></md-input>
+        <md-icon>keyboard_voice</md-icon>
+      </md-field> -->
 
-    <div class="empty"
+      <!-- <div class="searchDiv">
+        <input type="search"
+               name="search"
+               id="search">
+
+        </div>
+               -->
+
+      <div class="buscar-caja"
+           :class="{'isOpened' : isOpened}">
+
+        <input type="text"
+               name=""
+               class="buscar-txt"
+               placeholder="Search..."
+               :class="{'isOpened' : isOpened}"
+               v-model="search" />
+        <a class="md-icon-button buscar-btn"
+           @click="openSearchBar">
+          <!-- <i class="far fa-search"></i> -->
+          <md-icon>search</md-icon>
+        </a>
+      </div>
+
+      <div class="buscar-caja">
+        <a class="md-icon-button buscar-btn">
+          <!-- <i class="far fa-search"></i> -->
+          <md-icon>filter_list</md-icon>
+        </a>
+      </div>
+
+    </div>
+
+    <div v-if="data.length > 0"
+         class="_container">
+      <md-list class="listItem md-scrollbar">
+        <md-list-item class="listContainer"
+                      v-for="(item, index) in data"
+                      :key="index"
+                      @mouseover="eventMethod('mouseover',item)"
+                      @mouseleave="eventMethod('mouseleave',item)">
+          <span class="md-list-item-text">{{item.name}}</span>
+          <md-button class="md-icon-button"
+                     @click="linkUnlink(item)">
+            <md-icon>{{getIcon(item)}}</md-icon>
+          </md-button>
+        </md-list-item>
+      </md-list>
+      <pagination-component class="paginationContent"></pagination-component>
+    </div>
+
+    <div class="_container empty"
          v-else>
       No Data found !
     </div>
@@ -31,17 +74,24 @@ const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
 
+import paginationComponent from "./paginationComponent.vue";
+
 import EventBus from "../js/event";
 
 export default {
   name: "linkPanelContent",
+  components: { "pagination-component": paginationComponent },
   data() {
     this.contextId;
     this.groupId;
+    this.countPerPage = 10;
     return {
+      search: "",
+      isOpened: false,
       title: "",
       data: [],
-      dataLinked: []
+      dataLinked: [],
+      currentPage: 1
     };
   },
   methods: {
@@ -108,24 +158,81 @@ export default {
     },
     eventMethod(eventName, item) {
       EventBus.$emit(eventName, item);
+    },
+    openSearchBar() {
+      this.isOpened = !this.isOpened;
     }
   }
+  // computed: {
+  //   isOpened: function() {
+  //     return this.search.trim().length > 0;
+  //   }
+  // }
 };
 </script>
 
 <style scoped>
-.title {
-  text-align: center;
+.mdContent {
+  width: 100%;
+  height: 100%;
+}
+
+.header {
+  /* text-align: center;
+  font-size: 16px; */
+  width: 100%;
+  height: 40px;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+/* .header .searchDiv {
+  width: 60%;
+  height: 100%;
+  padding-top: 10px;
+} */
+
+._container {
+  width: 100%;
+  height: calc(100% - 40px);
+  overflow: hidden;
+}
+
+._container .listItem {
+  width: 100%;
+  height: calc(100% - 80px);
+  overflow: hidden;
+  overflow-y: auto;
 }
 
 .empty {
-  width: 100%;
-  height: 200px;
+  /* width: 100%;
+  height: 200px; */
   font-size: 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
+}
+
+.listContainer {
+  border-bottom: 1px solid white;
+}
+
+.listContainer:hover {
+  cursor: pointer;
+  background-color: gray;
+}
+
+.paginationContent {
+  width: 40%;
+  margin: auto;
+  height: 40px;
+}
+
+.paginationContent {
+  width: 100%;
+  height: 40px;
 }
 </style>
 
@@ -133,8 +240,73 @@ export default {
 <style>
 .listContainer .md-list-item-content {
   padding-left: 5px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  /* padding-top: 4px;
+  padding-bottom: 4px; */
+}
+
+/*
+//////////////////////////////////////////////////////////////////
+*/
+
+.buscar-caja {
+  /* position: absolute; */
+  /* top: 50%;
+  left: 50%; */
+  /* right: 0; */
+  /* transform: translate(-50%, -50%); */
+  /* background: #2f3640; */
+  height: 35px;
+  border-radius: 40px;
+  margin-top: 5px;
+  /* padding: 10px; */
+}
+
+.buscar-caja.isOpened {
+  background: #2f3640;
+}
+
+/* .buscar-caja:hover > .buscar-txt, */
+.buscar-caja > .buscar-txt.isOpened {
+  width: 240px;
+  padding: 0 6px;
+}
+
+/* .buscar-caja:hover > .buscar-btn {
+  background: white;
+  color: black;
+} */
+
+.buscar-btn {
+  color: #e84118;
+  float: right;
+  width: 40px;
+  height: 35px;
+  border-radius: 50%;
+  /* background: #2f3640; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.4s;
+  color: white;
+  cursor: pointer;
+}
+
+.buscar-btn > i {
+  font-size: 30px;
+}
+
+.buscar-txt {
+  border: none;
+  background: none;
+  outline: none;
+  float: left;
+  padding: 0;
+  color: white;
+  font-size: 16px;
+  transition: 0.4s;
+  line-height: 40px;
+  width: 0px;
+  /* font-weight: bold; */
 }
 </style>
 

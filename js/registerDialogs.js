@@ -46,6 +46,7 @@ let panels = [{
     closeBehaviour: "hide"
   },
   style: {
+    height: "475px",
     left: "400px"
   }
 }]
