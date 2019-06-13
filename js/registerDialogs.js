@@ -1,7 +1,9 @@
 import vue from "vue";
-import dialogComponent from "../vue/dialog.vue";
-import colorConfigDialog from '../vue/colorDialog.vue';
-import linkRoomDialog from '../vue/linkerDialog.vue'
+import dialogComponent from "../vue/create/dialog.vue";
+import colorConfigDialog from '../vue/color/colorDialog.vue';
+import linkRoomDialog from '../vue/panel/linkerDialog.vue'
+import GlobalLinkerPanel from "../vue/others/globalLinkerPanel.vue";
+
 
 const {
   SpinalMountExtention
@@ -39,17 +41,30 @@ for (let index = 0; index < dialogs.length; index++) {
 
 
 let panels = [{
-  name: "linkRoomPanel",
-  vueMountComponent: vue.extend(linkRoomDialog),
-  panel: {
-    title: "Link Rooms Panel",
-    closeBehaviour: "hide"
+    name: "linkRoomPanel",
+    vueMountComponent: vue.extend(linkRoomDialog),
+    panel: {
+      title: "Link Rooms Panel",
+      closeBehaviour: "hide"
+    },
+    style: {
+      height: "475px",
+      left: "400px"
+    }
   },
-  style: {
-    height: "475px",
-    left: "400px"
+  {
+    name: "globalLinkRoomPanel",
+    vueMountComponent: vue.extend(GlobalLinkerPanel),
+    panel: {
+      title: "Link",
+      closeBehaviour: "hide"
+    },
+    style: {
+      height: "475px",
+      left: "400px"
+    }
   }
-}]
+]
 
 
 for (let index = 0; index < panels.length; index++) {

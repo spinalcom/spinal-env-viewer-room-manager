@@ -9,7 +9,9 @@ import {
   ROOMS_GROUP_CONTEXT,
   EQUIPMENTS_GROUP_CONTEXT,
   ROOMS_GROUP,
-  EQUIPMENTS_GROUP
+  EQUIPMENTS_GROUP,
+  ROOMS_CATEGORY,
+  EQUIPMENTS_CATEGORY
 } from "../js/service";
 
 
@@ -34,14 +36,18 @@ class LinkRooms extends SpinalContextApp {
   }
 
   isShown(option) {
-    let contextType = option.context.type.get();
+    // let contextType = option.context.type.get();
     let nodeType = option.selectedNode.type.get();
 
-    let condition = (contextType === ROOMS_GROUP_CONTEXT || contextType ===
-      EQUIPMENTS_GROUP_CONTEXT) && (nodeType === ROOMS_GROUP || nodeType ===
-      EQUIPMENTS_GROUP);
+    let tempList = [ROOMS_GROUP_CONTEXT,
+      EQUIPMENTS_GROUP_CONTEXT,
+      ROOMS_GROUP,
+      EQUIPMENTS_GROUP,
+      ROOMS_CATEGORY,
+      EQUIPMENTS_CATEGORY
+    ]
 
-    return Promise.resolve(condition ? true : -1);
+    return Promise.resolve(tempList.indexOf(nodeType));
   }
 
   action(option) {
@@ -49,6 +55,29 @@ class LinkRooms extends SpinalContextApp {
     let contextId = option.context.id.get();
     let nodeId = option.selectedNode.id.get();
 
+
+
+    let tempList = [ROOMS_GROUP_CONTEXT,
+      EQUIPMENTS_GROUP_CONTEXT,
+      ROOMS_CATEGORY,
+      EQUIPMENTS_CATEGORY
+    ]
+
+    if (tempList.indexOf(nodeType) === -1) {
+      spinalPanelManagerService.openPanel(
+        "linkRoomPanel",
+        getParameter(
+          contextId,
+          nodeId,
+          nodeType
+        )
+      );
+    } else {
+      spinalPanelManagerService.openPanel("globalLinkRoomPanel", {
+        nodeId: nodeId,
+        contextId: contextId
+      })
+    }
 
     // let selectedContextRelation =
     //   nodeType === ROOMS_GROUP_CONTEXT ?
@@ -65,14 +94,7 @@ class LinkRooms extends SpinalContextApp {
     //   geographicService.constants.ROOM_RELATION :
     //   bimobjectservice.constants.BIM_OBJECT_RELATION_NAME;
 
-    spinalPanelManagerService.openPanel(
-      "linkRoomPanel",
-      getParameter(
-        contextId,
-        nodeId,
-        nodeType
-      )
-    );
+
   }
 }
 

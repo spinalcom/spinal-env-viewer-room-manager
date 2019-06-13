@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import * as allIcons from "../js/icons.json";
+import * as allIcons from "../../js/icons.json";
 
 export default {
   name: "iconComponent",

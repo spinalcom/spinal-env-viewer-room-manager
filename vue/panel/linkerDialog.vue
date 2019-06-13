@@ -32,12 +32,13 @@
         </a>
       </div>
 
-      <div class="buscar-caja">
+      <filter-menu></filter-menu>
+
+      <!-- <div class="buscar-caja">
         <a class="md-icon-button buscar-btn">
-          <!-- <i class="far fa-search"></i> -->
           <md-icon>filter_list</md-icon>
         </a>
-      </div>
+      </div> -->
 
     </div>
 
@@ -68,19 +69,24 @@
 </template>
 
 <script>
+import filterMenu from "../filterMenu/menu.vue";
+
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-import { groupService, ROOMS_GROUP } from "../js/service";
+import { groupService, ROOMS_GROUP } from "../../js/service";
 const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
 
-import paginationComponent from "./paginationComponent.vue";
+import paginationComponent from "../pagination/paginationComponent.vue";
 
-import EventBus from "../js/event";
+import EventBus from "../../js/event";
 
 export default {
   name: "linkPanelContent",
-  components: { "pagination-component": paginationComponent },
+  components: {
+    "pagination-component": paginationComponent,
+    "filter-menu": filterMenu
+  },
   data() {
     this.contextId;
     this.groupId;

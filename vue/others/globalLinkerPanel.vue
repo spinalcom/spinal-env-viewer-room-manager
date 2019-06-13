@@ -1,89 +1,35 @@
 <template>
-  <md-dialog :md-active.sync="showDialog"
+  <!-- <md-dialog :md-active.sync="showDialog"
              @md-closed="closeDialog(false)"
              class="dialog">
-    <md-dialog-title class="title">Link</md-dialog-title>
+    <md-dialog-title class="title">Link</md-dialog-title> -->
 
-    <md-dialog-content class="dialogContainer">
+  <!-- <md-dialog-content class="dialogContainer"> -->
 
-      <!-- <md-table v-model="searched"
-                class="table"
-                md-sort="name"
-                md-sort-order="asc"
-                md-fixed-header>
-        <md-table-toolbar class="md-layout md-gutter">
+  <table-component @filter="searchOnTable"
+                   :searched="searched"
+                   :groups="groups"
+                   :contextId="contextId"></table-component>
 
-          <div class="md-layout-item md-size-50">
+  <!-- </md-dialog-content> -->
 
-            <md-field>
-              <label for="floors">Filter By Floor</label>
-              <md-select v-model="floorsSelected"
-                         name="floors"
-                         id="floors"
-                         multiple>
-                <md-option value="fight-club">Fight Club</md-option>
-                <md-option value="godfather">Godfather</md-option>
-                <md-option value="godfather-ii">Godfather II</md-option>
-                <md-option value="godfather-iii">Godfather III</md-option>
-                <md-option value="godfellas">Godfellas</md-option>
-                <md-option value="pulp-fiction">Pulp Fiction</md-option>
-                <md-option value="scarface">Scarface</md-option>
-              </md-select>
-            </md-field>
-
-          </div>
-
-          <div class="md-layout-item md-size-50">
-
-            <md-field md-clearable>
-              <md-input placeholder="Search by name..."
-                        v-model="search"
-                        @input="searchOnTable" />
-            </md-field>
-
-          </div>
-        </md-table-toolbar>
-
-        <md-table-empty-state md-label="No Items found"></md-table-empty-state>
-
-        <md-table-row slot="md-table-row"
-                      slot-scope="{ item }">
-
-          <md-table-cell md-label="Name"
-                         md-sort-by="name">
-          </md-table-cell>
-
-        </md-table-row>
-
-
-      </md-table> -->
-
-      <table-component @filter="searchOnTable"
-                       :searched="searched"
-                       :groups="groups"
-                       :contextId="contextId"></table-component>
-
-    </md-dialog-content>
-
-    <md-dialog-actions>
-      <md-button class="md-primary"
-                 @click="closeDialog(false)">Close</md-button>
-      <!-- <md-button class="md-primary"
-                 @click="closeDialog(true)">Save</md-button> -->
-    </md-dialog-actions>
-  </md-dialog>
+  <!-- <md-dialog-actions>
+    <md-button class="md-primary"
+               @click="closeDialog(false)">Close</md-button>
+  </md-dialog-actions>
+  </md-dialog> -->
 
 </template>
 
 <script>
-import { groupService, ROOMS_GROUP_CONTEXT } from "../js/service";
+import { groupService, ROOMS_GROUP_CONTEXT } from "../../js/service";
 import tableComponent from "./tableComponent.vue";
 import { Lst } from "spinal-core-connectorjs_type";
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 import geographicService from "spinal-env-viewer-context-geographic-service";
 
 export default {
-  name: "linkRoomDialog",
+  name: "GlobalLinkerPanel",
   props: ["onFinised"],
   components: {
     "table-component": tableComponent
@@ -102,16 +48,16 @@ export default {
   },
   methods: {
     opened(option) {
-      option.then(res => {
-        if (res) {
-          this.groups = new Lst(res.groups).get();
-          this.elements = new Lst(res.elements).get();
-          this.searched = new Lst(res.elements).get();
-          this.contextId = res.contextId;
-
-          this.allData = this.getList(this.groups, this.elements);
-        }
-      });
+      console.log("option", option);
+      // option.then(res => {
+      //   if (res) {
+      //     this.groups = new Lst(res.groups).get();
+      //     this.elements = new Lst(res.elements).get();
+      //     this.searched = new Lst(res.elements).get();
+      //     this.contextId = res.contextId;
+      //     this.allData = this.getList(this.groups, this.elements);
+      //   }
+      // });
     },
 
     removed() {

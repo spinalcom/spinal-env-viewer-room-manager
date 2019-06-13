@@ -52,7 +52,7 @@ import {
   EQUIPMENTS_GROUP,
   ROOMS_GROUP,
   groupService
-} from "../js/service";
+} from "../../js/service";
 
 import bimObjectService from "spinal-env-viewer-plugin-bimobjectservice";
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";

@@ -6,7 +6,7 @@
 
 
 <script>
-import { groupService } from "../js/service";
+import { groupService } from "../../js/service";
 
 export default {
   name: "checkboxComponent",

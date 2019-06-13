@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import * as allIcons from "../js/materialIcons.json";
+import * as allIcons from "../../js/materialIcons.json";
 
 export default {
   name: "iconComponent",
