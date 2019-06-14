@@ -1,7 +1,10 @@
 
 <template>
-  <md-table v-model="searched"
-            class="table"
+  <!-- v-model="searched" md-sort="name"
+            md-sort-order="asc"
+            md-fixed-header -->
+  <md-table class="table"
+            v-model="searched"
             md-sort="name"
             md-sort-order="asc"
             md-fixed-header>
@@ -40,6 +43,8 @@
 
     <md-table-row slot="md-table-row"
                   slot-scope="{item}">
+      <!-- <md-table-row slot="md-table-row"
+                  v-for="item in searched"> -->
       <md-table-cell md-label="Name"
                      md-sort-by="name">{{item.name}}</md-table-cell>
 
@@ -80,7 +85,7 @@ export default {
       }
     };
   },
-  created() {
+  mounted() {
     let context = SpinalGraphService.getContext(
       geographicService.constants.FLOOR_REFERENCE_CONTEXT
     );

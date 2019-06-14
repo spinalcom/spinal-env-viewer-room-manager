@@ -111,19 +111,35 @@ let groupService = {
 
   },
   elementIsLinkedToGroup(groupId, elementId) {
-    let type = SpinalGraphService.getInfo(groupId).type.get();
+    let realNode = SpinalGraphService.getRealNode(groupId);
+    const type = realNode.getType().get();
+
     let relationName = type === ROOMS_GROUP ? ROOMS_TO_ELEMENT_RELATION :
       EQUIPMENTS_TO_ELEMENT_RELATION;
 
-    return SpinalGraphService.getChildren(groupId, [relationName]).then(
-      children => {
-        for (let i = 0; i < children.length; i++) {
-          const element = children[i];
-          if (element.id.get() === elementId) return true;
+    try {
+      let ids = realNode.children[SPINAL_RELATION_PTR_LST_TYPE][relationName]
+        .children.info.ids;
 
-        }
-        return false;
-      });
+      return Promise.resolve(ids.has((el) => {
+        return el.get() === elementId
+      }))
+    } catch (error) {
+      // let type = SpinalGraphService.getInfo(groupId).type.get();
+      // let relationName = type === ROOMS_GROUP ? ROOMS_TO_ELEMENT_RELATION :
+      //   EQUIPMENTS_TO_ELEMENT_RELATION;
+
+      return SpinalGraphService.getChildren(groupId, [relationName]).then(
+        children => {
+          for (let i = 0; i < children.length; i++) {
+            const element = children[i];
+            if (element.id.get() === elementId) return true;
+
+          }
+          return false;
+        });
+    }
+
   },
   linkElementToGroup(groupId, elementId, contextId) {
     let type = SpinalGraphService.getInfo(groupId).type.get();

@@ -5,7 +5,6 @@
     <md-dialog-title class="title">Link</md-dialog-title> -->
 
   <!-- <md-dialog-content class="dialogContainer"> -->
-
   <table-component @filter="searchOnTable"
                    :searched="searched"
                    :groups="groups"
@@ -22,11 +21,22 @@
 </template>
 
 <script>
-import { groupService, ROOMS_GROUP_CONTEXT } from "../../js/service";
+import {
+  groupService,
+  ROOMS_GROUP_CONTEXT,
+  ROOMS_CATEGORY_RELATION,
+  EQUIPMENTS_CATEGORY_RELATION,
+  ROOMS_GROUP_RELATION,
+  EQUIPMENTS_GROUP_RELATION,
+  ROOMS_GROUP,
+  EQUIPMENTS_GROUP
+} from "../../js/service";
+
 import tableComponent from "./tableComponent.vue";
 import { Lst } from "spinal-core-connectorjs_type";
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 import geographicService from "spinal-env-viewer-context-geographic-service";
+import bimobjectservice from "spinal-env-viewer-plugin-bimobjectservice";
 
 export default {
   name: "GlobalLinkerPanel",
@@ -48,26 +58,31 @@ export default {
   },
   methods: {
     opened(option) {
-      console.log("option", option);
-      // option.then(res => {
-      //   if (res) {
-      //     this.groups = new Lst(res.groups).get();
-      //     this.elements = new Lst(res.elements).get();
-      //     this.searched = new Lst(res.elements).get();
-      //     this.contextId = res.contextId;
-      //     this.allData = this.getList(this.groups, this.elements);
-      //   }
-      // });
+      this.getData(option.nodeId, option.contextId).then(async res => {
+        if (res) {
+          console.log("res", res);
+
+          this.groups = res.groups;
+          this.elements = res.elements.slice(0, 10);
+          this.searched = res.elements.slice(0, 10);
+          // this.elements = res.elements;
+          // this.searched = res.elements;
+          this.contextId = res.contextId;
+          // console.log("start");
+          // this.allData = await this.getList(this.groups, this.elements);
+          // console.log("end", this.allData);
+        }
+      });
     },
 
-    removed() {
-      this.showDialog = false;
-    },
-    closeDialog(closeResult) {
-      if (typeof this.onFinised === "function") {
-        this.onFinised(closeResult);
-      }
-    },
+    // removed() {
+    //   this.showDialog = false;
+    // },
+    // closeDialog(closeResult) {
+    //   if (typeof this.onFinised === "function") {
+    //     this.onFinised(closeResult);
+    //   }
+    // },
     searchOnTable(params) {
       this.filterByFloor(params.floorsSelected).then(res => {
         if (params.search && params.search.trim().length > 0) {
@@ -116,20 +131,59 @@ export default {
       }
     },
 
-    getList(groups, elements) {
-      let res = [];
+    // getList(groups, elements) {
+    //   let res = elements.map(element => {
+    //     let obj = [Promise.resolve(element.name)];
 
-      elements.forEach(element => {
-        let obj = [element.name];
+    //     const l = groups.map(group => {
+    //       return groupService.elementIsLinkedToGroup(group.id, element.id);
+    //     });
 
-        groups.forEach(async group => {
-          obj.push(
-            await groupService.elementIsLinkedToGroup(group.id, element.id)
-          );
-        });
-        res.push(obj);
+    //     return Promise.all(obj.concat(l));
+    //   });
+    //   return Promise.all(res);
+    // },
+
+    getData(nodeId, contextId) {
+      const contextType = SpinalGraphService.getInfo(contextId).type.get();
+
+      let selectedContextRelation =
+        contextType === ROOMS_GROUP_CONTEXT
+          ? [ROOMS_GROUP_RELATION, ROOMS_CATEGORY_RELATION]
+          : [EQUIPMENTS_GROUP_RELATION, EQUIPMENTS_CATEGORY_RELATION];
+
+      let refContextName =
+        contextType === ROOMS_GROUP_CONTEXT
+          ? geographicService.constants.ROOM_REFERENCE_CONTEXT
+          : bimobjectservice.constants.BIM_OBJECT_CONTEXT_TYPE;
+
+      let refContextRelation =
+        contextType === ROOMS_GROUP_CONTEXT
+          ? geographicService.constants.ROOM_RELATION
+          : bimobjectservice.constants.BIM_OBJECT_RELATION_NAME;
+
+      let context = SpinalGraphService.getContext(refContextName);
+
+      return SpinalGraphService.findNodes(
+        nodeId,
+        selectedContextRelation,
+        node => {
+          let type = node.getType().get();
+          return type === ROOMS_GROUP || type === EQUIPMENTS_GROUP;
+        }
+      ).then(async res => {
+        return {
+          contextId: contextId,
+          groups: res.map(el => el.info.get()),
+          elements: context
+            ? await SpinalGraphService.getChildren(context.info.id.get(), [
+                refContextRelation
+              ]).then(el => {
+                return el.map(x => x.get());
+              })
+            : []
+        };
       });
-      return res;
     }
   }
 };
