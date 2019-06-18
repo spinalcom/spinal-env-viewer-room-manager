@@ -32,21 +32,15 @@
         </a>
       </div>
 
-      <filter-menu></filter-menu>
-
-      <!-- <div class="buscar-caja">
-        <a class="md-icon-button buscar-btn">
-          <md-icon>filter_list</md-icon>
-        </a>
-      </div> -->
+      <!-- <filter-menu></filter-menu> -->
 
     </div>
 
-    <div v-if="data.length > 0"
+    <div v-if="tempList.length > 0 && !loaded"
          class="_container">
       <md-list class="listItem md-scrollbar">
         <md-list-item class="listContainer"
-                      v-for="(item, index) in data"
+                      v-for="(item, index) in tempList"
                       :key="index"
                       @mouseover="eventMethod('mouseover',item)"
                       @mouseleave="eventMethod('mouseleave',item)">
@@ -57,12 +51,17 @@
           </md-button>
         </md-list-item>
       </md-list>
-      <pagination-component class="paginationContent"></pagination-component>
+      <!-- <pagination-component class="paginationContent"></pagination-component> -->
     </div>
 
     <div class="_container empty"
-         v-else>
+         v-if="tempList.length === 0 && !loaded">
       No Data found !
+    </div>
+
+    <div class="_container empty"
+         v-if="loaded">
+      Loading...
     </div>
 
   </md-content>
@@ -77,17 +76,18 @@ const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
 
-import paginationComponent from "../pagination/paginationComponent.vue";
+// import paginationComponent from "../pagination/paginationComponent.vue";
 
 import EventBus from "../../js/event";
 
 export default {
   name: "linkPanelContent",
   components: {
-    "pagination-component": paginationComponent,
+    // "pagination-component": paginationComponent,
     "filter-menu": filterMenu
   },
   data() {
+    this.data = [];
     this.contextId;
     this.groupId;
     this.countPerPage = 10;
@@ -95,13 +95,15 @@ export default {
       search: "",
       isOpened: false,
       title: "",
-      data: [],
+      tempList: [],
       dataLinked: [],
-      currentPage: 1
+      currentPage: 1,
+      loaded: true
     };
   },
   methods: {
-    async opened(option) {
+    opened(option) {
+      this.loaded = true;
       this.contextId = option.contextId;
       this.groupId = option.nodeId;
 
@@ -111,14 +113,27 @@ export default {
       let refContext = SpinalGraphService.getContext(option.reference.context);
 
       if (typeof refContext === "undefined") {
+        this.tempList = [];
         this.data = [];
         this.dataLinked = [];
+        this.loaded = false;
         return;
       }
 
       let refContextId = refContext.info.id.get();
-      this.data = await this.getData(refContextId, option.reference.relation);
-      this.dataLinked = await this.getDataLinked(option.nodeId);
+
+      Promise.all([
+        this.getData(refContextId, option.reference.relation),
+        this.getDataLinked(option.nodeId)
+      ]).then(res => {
+        this.data = res[0];
+        this.tempList = res[0];
+        this.dataLinked = res[1];
+        this.loaded = false;
+      });
+
+      // this.data = await this.getData(refContextId, option.reference.relation);
+      // this.dataLinked = await this.getDataLinked(option.nodeId);
     },
 
     getData(parentId, relationName) {
@@ -167,6 +182,19 @@ export default {
     },
     openSearchBar() {
       this.isOpened = !this.isOpened;
+    }
+  },
+  watch: {
+    search: function(newValue) {
+      newValue = newValue.trim();
+      console.log("newValue", newValue);
+      if (newValue.length === 0) {
+        this.tempList = this.data;
+      } else {
+        this.tempList = this.data.filter(el => {
+          return el.name.toLowerCase().includes(newValue);
+        });
+      }
     }
   }
   // computed: {

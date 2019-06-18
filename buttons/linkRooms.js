@@ -39,12 +39,13 @@ class LinkRooms extends SpinalContextApp {
     // let contextType = option.context.type.get();
     let nodeType = option.selectedNode.type.get();
 
-    let tempList = [ROOMS_GROUP_CONTEXT,
-      EQUIPMENTS_GROUP_CONTEXT,
+    let tempList = [
+      // ROOMS_GROUP_CONTEXT,
+      // EQUIPMENTS_GROUP_CONTEXT,
+      // ROOMS_CATEGORY,
+      // EQUIPMENTS_CATEGORY,
       ROOMS_GROUP,
-      EQUIPMENTS_GROUP,
-      ROOMS_CATEGORY,
-      EQUIPMENTS_CATEGORY
+      EQUIPMENTS_GROUP
     ]
 
     return Promise.resolve(tempList.indexOf(nodeType));
@@ -54,8 +55,6 @@ class LinkRooms extends SpinalContextApp {
     let nodeType = option.selectedNode.type.get();
     let contextId = option.context.id.get();
     let nodeId = option.selectedNode.id.get();
-
-
 
     let tempList = [ROOMS_GROUP_CONTEXT,
       EQUIPMENTS_GROUP_CONTEXT,
@@ -118,25 +117,5 @@ let getParameter = (contextId, nodeId, nodeType) => {
   }
 }
 
-// let getParameter2 = (
-//   selectedContextId,
-//   selectedContextRelation,
-//   refContextName,
-//   refContextRelation
-// ) => {
-//   let context = SpinalGraphService.getContext(refContextName);
-//   return SpinalGraphService.getChildren(selectedContextId, [
-//     selectedContextRelation
-//   ]).then(async res => {
-//     return {
-//       contextId: selectedContextId,
-//       groups: res,
-//       elements: context ?
-//         await SpinalGraphService.getChildren(context.info.id.get(), [
-//           refContextRelation
-//         ]) : []
-//     };
-//   });
-// };
 
 export default LinkRooms;
