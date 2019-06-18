@@ -21,7 +21,7 @@ const HEADERBAR = "GraphManagerTopBar";
 
 spinalContextMenuService.registerApp(HEADERBAR, new ContextGroupBtn());
 spinalContextMenuService.registerApp(SIDEBAR, new CreateElement());
-spinalContextMenuService.registerApp(SIDEBAR, new ViewChildren());
+spinalContextMenuService.registerApp(SIDEBAR, new ViewChildren(), [7]);
 spinalContextMenuService.registerApp(SIDEBAR, new ColorConfig());
 spinalContextMenuService.registerApp(SIDEBAR, new LinkRooms());
 // spinalContextMenuService.registerApp(SIDEBAR, new AddToReference());
