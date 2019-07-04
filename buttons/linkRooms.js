@@ -36,14 +36,18 @@ class LinkRooms extends SpinalContextApp {
   }
 
   isShown(option) {
-    // let contextType = option.context.type.get();
+    /* Commenter pour desactiver le panel global */
+    // let contextType = option.context.type
+    // .get();
+
+
     let nodeType = option.selectedNode.type.get();
 
     let tempList = [
-      // ROOMS_GROUP_CONTEXT,
-      // EQUIPMENTS_GROUP_CONTEXT,
-      // ROOMS_CATEGORY,
-      // EQUIPMENTS_CATEGORY,
+      // ROOMS_GROUP_CONTEXT, /* Commenter pour desactiver le panel global */
+      // EQUIPMENTS_GROUP_CONTEXT, /* Commenter pour desactiver le panel global */
+      // ROOMS_CATEGORY, /* Commenter pour desactiver le panel global */
+      // EQUIPMENTS_CATEGORY, /* Commenter pour desactiver le panel global */
       ROOMS_GROUP,
       EQUIPMENTS_GROUP
     ]
