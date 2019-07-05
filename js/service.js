@@ -200,6 +200,143 @@ let groupService = {
       EQUIPMENTS_TO_ELEMENT_RELATION;
 
     return SpinalGraphService.getChildren(groupId, [relationName]);
+  },
+
+  getGroups(selectedNode) {
+
+    const ROOMS_TYPES = [
+      ROOMS_GROUP_CONTEXT,
+      ROOMS_CATEGORY,
+      ROOMS_GROUP
+    ]
+
+
+    let type = selectedNode.type.get();
+    let nodeId = selectedNode.id.get();
+
+    if (type === ROOMS_GROUP || type === EQUIPMENTS_GROUP) {
+      return Promise.resolve([selectedNode]);
+    }
+
+    let relations = ROOMS_TYPES.indexOf(type) !== -1 ? [
+      ROOMS_CATEGORY_RELATION, ROOMS_GROUP_RELATION
+    ] : [EQUIPMENTS_CATEGORY_RELATION, EQUIPMENTS_GROUP_RELATION];
+
+    return SpinalGraphService.findNodes(nodeId, relations, (node) => {
+      let argType = node.getType().get()
+      return argType === ROOMS_GROUP || argType === EQUIPMENTS_GROUP
+    }).then(res => {
+      return res.map(el => {
+        SpinalGraphService._addNode(el);
+        return el.info;
+      })
+    })
+  },
+
+  getCategorie(selectedNode) {
+    let type = selectedNode.type.get();
+    let nodeId = selectedNode.id.get();
+
+    if (type === ROOMS_CATEGORY || type === EQUIPMENTS_CATEGORY) {
+
+      return Promise.resolve(selectedNode);
+
+    } else if (type === ROOMS_GROUP_CONTEXT || type ===
+      EQUIPMENTS_GROUP_CONTEXT) {
+      let relationName = type === ROOMS_GROUP_CONTEXT ?
+        ROOMS_CATEGORY_RELATION : EQUIPMENTS_CATEGORY_RELATION;
+
+      return SpinalGraphService.getChildren(nodeId, [relationName]);
+
+    } else {
+      let relationRefPromises = [];
+
+
+      let node = SpinalGraphService.getRealNode(nodeId);
+      let relationName = type === ROOMS_GROUP ? ROOMS_GROUP_RELATION :
+        EQUIPMENTS_GROUP_RELATION;
+
+
+      let relationList = node.parents[relationName];
+
+      if (relationList) {
+
+        for (let i = 0; i < relationList.length; i++) {
+          const element = relationList[i];
+          relationRefPromises.push(element.load());
+        }
+
+      }
+
+      return Promise.all(relationRefPromises).then(refs => {
+
+        // let promises = [];
+
+        let promises = refs.map(node => {
+          return node.parent.load();
+        })
+
+
+        return Promise.all(promises).then(parents => {
+          // let p = [];
+          // parents.forEach(el => {
+          //   if (el && !(el instanceof SpinalContext)) {
+          //     p.push(new SpinalCalNode(el));
+          //   }
+          // })
+
+          // return p;
+
+          return parents.map(el => {
+            return el.info;
+          })
+
+        });
+
+      })
+
+
+    }
+  },
+
+  getParents() {
+    let relationRefPromises = [];
+
+    GEOGRAPHIC_RELATIONS.forEach(relation => {
+      let relationList = this.node.parents[relation];
+
+      if (relationList) {
+
+        for (let i = 0; i < relationList.length; i++) {
+          const ref = relationList[i];
+          relationRefPromises.push(ref.load());
+        }
+      }
+
+    });
+
+    return Promise.all(relationRefPromises).then(refs => {
+
+      let promises = [];
+
+      refs.forEach(node => {
+        promises.push(node.parent.load());
+      })
+
+
+      return Promise.all(promises).then(parents => {
+        let p = [];
+        parents.forEach(el => {
+          if (el && !(el instanceof SpinalContext)) {
+            p.push(new SpinalCalNode(el));
+          }
+        })
+
+        return p;
+      });
+
+    })
+
   }
 };
 

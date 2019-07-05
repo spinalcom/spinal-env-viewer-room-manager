@@ -7,12 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "spinal-env-viewer-bim-manager-service": "https://github.com/spinalcom/spinal-env-viewer-bim-manager-service.git",
     "spinal-env-viewer-context-geographic-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-geographic-service.git",
     "spinal-env-viewer-context-menu-service": "git+https://github.com/spinalcom/spinal-env-viewer-context-menu-service.git",
     "spinal-env-viewer-graph-service": "git+https://github.com/spinalcom/Spinal-Graph-Service.git",
     "spinal-env-viewer-plugin-bimobjectservice": "git+https://github.com/spinalcom/spinal-env-viewer-plugin-bimobjectservice.git",
-    "spinal-env-viewer-bim-manager-service": "https://github.com/spinalcom/spinal-env-viewer-bim-manager-service.git",
-    "vue-color": "^2.7.0"
+    "vue-color": "^2.7.0",
+    "vue-virtual-scroller": "^1.0.0-rc.2"
   },
   "keywords": [],
   "author": "",

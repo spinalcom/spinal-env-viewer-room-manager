@@ -45,14 +45,46 @@
                       @mouseover="eventMethod('mouseover',item)"
                       @mouseleave="eventMethod('mouseleave',item)">
           <span class="md-list-item-text">{{item.name}}</span>
+
+          <div v-if="elementExistInCategory(item)"
+               class="groupColor"
+               :style="{backgroundColor : item.groupColor}"
+               :title="'Linked to ' + item.groupName"></div>
+
           <md-button class="md-icon-button"
                      @click="linkUnlink(item)">
             <md-icon>{{getIcon(item)}}</md-icon>
           </md-button>
         </md-list-item>
       </md-list>
-      <!-- <pagination-component class="paginationContent"></pagination-component> -->
     </div>
+
+    <!-- <md-list v-if="tempList.length > 0 && !loaded">
+      <DynamicScroller :items="tempList"
+                       :min-item-size="10"
+                       class="_container">
+
+        <template v-slot="{item,index,active}">
+
+          <DynamicScrollerItem :item="item"
+                               :active="active"
+                               :data-index="index"></DynamicScrollerItem>
+
+          <md-list-item class="listContainer"
+                        :key="index"
+                        @mouseover="eventMethod('mouseover',item)"
+                        @mouseleave="eventMethod('mouseleave',item)">
+            <span class="md-list-item-text">{{item.name}}</span>
+            <md-button class="md-icon-button"
+                       @click="linkUnlink(item)">
+              <md-icon>{{getIcon(item)}}</md-icon>
+            </md-button>
+          </md-list-item>
+
+        </template>
+
+      </DynamicScroller>
+    </md-list> -->
 
     <div class="_container empty"
          v-if="tempList.length === 0 && !loaded">
@@ -68,10 +100,22 @@
 </template>
 
 <script>
+// import Vue from "vue";
+// import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
+
+// Vue.component("DynamicScroller", DynamicScroller);
+// Vue.component("DynamicScrollerItem", DynamicScrollerItem);
+
 import filterMenu from "../filterMenu/menu.vue";
 
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-import { groupService, ROOMS_GROUP } from "../../js/service";
+import {
+  groupService,
+  ROOMS_GROUP,
+  ROOMS_CATEGORY,
+  ROOMS_GROUP_RELATION,
+  EQUIPMENTS_GROUP_RELATION
+} from "../../js/service";
 const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
@@ -98,7 +142,8 @@ export default {
       tempList: [],
       dataLinked: [],
       currentPage: 1,
-      loaded: true
+      loaded: true,
+      categorySumary: []
     };
   },
   methods: {
@@ -124,11 +169,14 @@ export default {
 
       Promise.all([
         this.getData(refContextId, option.reference.relation),
-        this.getDataLinked(option.nodeId)
+        this.getDataLinked(option.nodeId),
+        this.getOtherGroupData(option.nodeId)
       ]).then(res => {
         this.data = res[0];
         this.tempList = res[0];
         this.dataLinked = res[1];
+        this.categorySumary = res[2];
+
         this.loaded = false;
       });
 
@@ -182,6 +230,51 @@ export default {
     },
     openSearchBar() {
       this.isOpened = !this.isOpened;
+    },
+    getOtherGroupData(nodeId) {
+      return groupService
+        .getCategorie(SpinalGraphService.getInfo(nodeId))
+        .then(res => {
+          let parent = res ? res[0] : undefined;
+
+          if (parent) {
+            let type = parent.type.get();
+            let relationName =
+              type === ROOMS_CATEGORY
+                ? ROOMS_GROUP_RELATION
+                : EQUIPMENTS_GROUP_RELATION;
+
+            return SpinalGraphService.getChildren(parent.id.get(), [
+              relationName
+            ]).then(children => {
+              return children
+                .filter(child => {
+                  return child.id.get() !== nodeId;
+                })
+                .map(el => {
+                  return {
+                    name: el.name.get(),
+                    color: el.color.get(),
+                    children: el.childrenIds
+                  };
+                });
+            });
+          }
+        });
+    },
+    elementExistInCategory(item) {
+      let id = item.id;
+      let parent = this.categorySumary.find(el => {
+        return el.children.indexOf(id) !== -1;
+      });
+
+      if (typeof parent !== "undefined") {
+        item["groupName"] = parent.name;
+        item["groupColor"] = parent.color;
+        return true;
+      }
+
+      return false;
     }
   },
   watch: {
@@ -267,6 +360,12 @@ export default {
 .paginationContent {
   width: 100%;
   height: 40px;
+}
+
+.groupColor {
+  width: 24px;
+  height: 24px;
+  border: 1px solid white;
 }
 </style>
 
