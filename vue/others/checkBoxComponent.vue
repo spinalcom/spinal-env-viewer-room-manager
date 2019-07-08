@@ -20,7 +20,7 @@ export default {
     groupService
       .elementIsLinkedToGroup(this.groupId, this.elementId)
       .then(el => {
-        console.log("isLinked", el);
+        // console.log("isLinked", el);
 
         this.value = el;
       });

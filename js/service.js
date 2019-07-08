@@ -142,19 +142,48 @@ let groupService = {
 
   },
   linkElementToGroup(groupId, elementId, contextId) {
-    let type = SpinalGraphService.getInfo(groupId).type.get();
-    let relationName = type === ROOMS_GROUP ? ROOMS_TO_ELEMENT_RELATION :
+
+    let groupInfo = SpinalGraphService.getInfo(groupId);
+
+    let relationName = groupInfo.type.get() === ROOMS_GROUP ?
+      ROOMS_TO_ELEMENT_RELATION :
       EQUIPMENTS_TO_ELEMENT_RELATION;
 
-    return SpinalGraphService.addChildInContext(groupId, elementId, contextId,
-      relationName, SPINAL_RELATION_PTR_LST_TYPE);
+    //
+
+    return this.getCategorie(groupInfo).then(category => {
+
+      return this.elementIsInCategorie(category[0].id.get(), elementId)
+        .then(
+          group => {
+            let result = {
+              old_group: undefined,
+              newGroup: groupId
+            }
+
+            if (typeof group !== "undefined") {
+              this.removeLink(group.id.get(), elementId);
+              result.old_group = group.id.get();
+            }
+
+            SpinalGraphService.addChildInContext(groupId,
+              elementId, contextId, relationName,
+              SPINAL_RELATION_PTR_LST_TYPE);
+
+
+            return result;
+
+          })
+    })
+
   },
   removeLink(groupId, elementId) {
     let type = SpinalGraphService.getInfo(groupId).type.get();
     let relationName = type === ROOMS_GROUP ? ROOMS_TO_ELEMENT_RELATION :
       EQUIPMENTS_TO_ELEMENT_RELATION;
 
-    return SpinalGraphService.removeChild(groupId, elementId, relationName,
+    return SpinalGraphService.removeChild(groupId, elementId,
+      relationName,
       SPINAL_RELATION_PTR_LST_TYPE)
   },
   getTypeAndRelation(elementType) {
@@ -289,7 +318,7 @@ let groupService = {
 
           return parents.map(el => {
             return el.info;
-          })
+          });
 
         });
 
@@ -299,45 +328,30 @@ let groupService = {
     }
   },
 
-  getParents() {
-    let relationRefPromises = [];
+  elementIsInCategorie(categoryId, elementId) {
 
-    GEOGRAPHIC_RELATIONS.forEach(relation => {
-      let relationList = this.node.parents[relation];
+    let nodeInfo = SpinalGraphService.getInfo(categoryId);
+    let type = nodeInfo.type.get();
 
-      if (relationList) {
+    let relationName =
+      type === ROOMS_CATEGORY ?
+      ROOMS_GROUP_RELATION :
+      EQUIPMENTS_GROUP_RELATION;
 
-        for (let i = 0; i < relationList.length; i++) {
-          const ref = relationList[i];
-          relationRefPromises.push(ref.load());
-        }
-      }
+    return SpinalGraphService.getChildren(categoryId, [relationName])
+      .then(
+        children => {
 
-    });
+          return children.find(child => {
+            return child.childrenIds.find(el => {
+              return el === elementId
+            })
+          })
 
-    return Promise.all(relationRefPromises).then(refs => {
-
-      let promises = [];
-
-      refs.forEach(node => {
-        promises.push(node.parent.load());
-      })
-
-
-      return Promise.all(promises).then(parents => {
-        let p = [];
-        parents.forEach(el => {
-          if (el && !(el instanceof SpinalContext)) {
-            p.push(new SpinalCalNode(el));
-          }
         })
 
-        return p;
-      });
-
-    })
-
   }
+
 };
 
 export {

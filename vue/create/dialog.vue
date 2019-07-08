@@ -147,34 +147,52 @@ export default {
     },
 
     addBimObject() {
-      let selected = window.spinal.ForgeViewer.viewer.getSelection();
+      let selected = window.spinal.ForgeViewer.viewer.getAggregateSelection();
+
       if (selected.length === 0) {
         alert("select an item");
         return;
       }
 
-      let tempSelected = [];
+      // let tempSelected = [];
 
-      selected.forEach(el => {
-        tempSelected.push(
-          ...bimObjectManagerService.getLeafDbIds(
-            window.spinal.ForgeViewer.viewer.model,
-            el
-          )
+      // selected.forEach(el => {
+      //   console.log("el", el);
+      //   tempSelected.push(
+      //     ...bimObjectManagerService.getLeafDbIds(el.model, el.selection)
+      //   );
+      // });
+
+      selected = selected.map(el => {
+        let leafDbIds = bimObjectManagerService.getLeafDbIds(
+          el.model,
+          el.selection
         );
+
+        return bimObjectManagerService.getBimObjectProperties(leafDbIds);
       });
 
-      window.spinal.ForgeViewer.viewer.model.getBulkProperties(
-        tempSelected,
-        {
-          propFilter: ["name"]
-        },
-        res => {
-          res.forEach(el => {
-            this.createBimObjectNode(el);
+      Promise.all(selected).then(values => {
+        values.forEach(res => {
+          res.forEach(n => {
+            n.properties.forEach(el => {
+              this.createBimObjectNode(el);
+            });
           });
-        }
-      );
+        });
+      });
+
+      // window.spinal.ForgeViewer.viewer.model.getBulkProperties(
+      //   tempSelected,
+      //   {
+      //     propFilter: ["name"]
+      //   },
+      //   res => {
+      //     res.forEach(el => {
+      //       this.createBimObjectNode(el);
+      //     });
+      //   }
+      // );
     },
 
     createBimObjectNode(bimElement) {

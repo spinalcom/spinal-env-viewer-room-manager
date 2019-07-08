@@ -58,9 +58,9 @@ export default {
   },
   methods: {
     opened(option) {
-      this.getData(option.nodeId, option.contextId).then(async res => {
+      this.getData(option.nodeId, option.contextId).then(res => {
         if (res) {
-          console.log("res", res);
+          // console.log("res", res);
 
           this.groups = res.groups;
           this.elements = res.elements.slice(0, 10);

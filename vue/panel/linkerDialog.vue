@@ -36,7 +36,7 @@
 
     </div>
 
-    <div v-if="tempList.length > 0 && !loaded"
+    <div v-if="tempList.length > 0 && !loaded && !error"
          class="_container">
       <md-list class="listItem md-scrollbar">
         <md-list-item class="listContainer"
@@ -87,13 +87,18 @@
     </md-list> -->
 
     <div class="_container empty"
-         v-if="tempList.length === 0 && !loaded">
+         v-if="tempList.length === 0 && !loaded && !error">
       No Data found !
     </div>
 
     <div class="_container empty"
-         v-if="loaded">
+         v-if="loaded && !error">
       Loading...
+    </div>
+
+    <div class="_container empty"
+         v-if="error">
+      Sorry, Something was wrong. Please retry !!
     </div>
 
   </md-content>
@@ -106,7 +111,7 @@
 // Vue.component("DynamicScroller", DynamicScroller);
 // Vue.component("DynamicScrollerItem", DynamicScrollerItem);
 
-import filterMenu from "../filterMenu/menu.vue";
+// import filterMenu from "../filterMenu/menu.vue";
 
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 import {
@@ -128,7 +133,7 @@ export default {
   name: "linkPanelContent",
   components: {
     // "pagination-component": paginationComponent,
-    "filter-menu": filterMenu
+    // "filter-menu": filterMenu
   },
   data() {
     this.data = [];
@@ -143,12 +148,14 @@ export default {
       dataLinked: [],
       currentPage: 1,
       loaded: true,
+      error: false,
       categorySumary: []
     };
   },
   methods: {
     opened(option) {
       this.loaded = true;
+      this.error = false;
       this.contextId = option.contextId;
       this.groupId = option.nodeId;
 
@@ -171,14 +178,20 @@ export default {
         this.getData(refContextId, option.reference.relation),
         this.getDataLinked(option.nodeId),
         this.getOtherGroupData(option.nodeId)
-      ]).then(res => {
-        this.data = res[0];
-        this.tempList = res[0];
-        this.dataLinked = res[1];
-        this.categorySumary = res[2];
+      ])
+        .then(res => {
+          this.data = res[0];
+          this.tempList = res[0];
+          this.dataLinked = res[1];
+          this.categorySumary = res[2];
 
-        this.loaded = false;
-      });
+          this.loaded = false;
+        })
+        .catch(() => {
+          // console.log(error);
+
+          this.error = true;
+        });
 
       // this.data = await this.getData(refContextId, option.reference.relation);
       // this.dataLinked = await this.getDataLinked(option.nodeId);
@@ -210,7 +223,7 @@ export default {
     deleteItem(item) {
       for (let i = 0; i < this.dataLinked.length; i++) {
         const element = this.dataLinked[i];
-        if (element.id === item.item) {
+        if (element.id === item.id) {
           this.dataLinked.splice(i, 1);
           return;
         }
@@ -218,11 +231,27 @@ export default {
     },
     linkUnlink(item) {
       if (this.isLinked(item)) {
-        this.deleteItem(item);
-        groupService.removeLink(this.groupId, item.id);
+        groupService.removeLink(this.groupId, item.id).then(() => {
+          this.deleteItem(item);
+        });
       } else {
-        this.dataLinked.push(item);
-        groupService.linkElementToGroup(this.groupId, item.id, this.contextId);
+        groupService
+          .linkElementToGroup(this.groupId, item.id, this.contextId)
+          .then(res => {
+            if (typeof res.old_group !== "undefined") {
+              let group = this.categorySumary.find(el => {
+                return el.id === res.old_group;
+              });
+
+              if (typeof group !== "undefined") {
+                group.children = group.children.filter(el => {
+                  return el !== item.id;
+                });
+              }
+            }
+
+            this.dataLinked.push(item);
+          });
       }
     },
     eventMethod(eventName, item) {
@@ -252,9 +281,11 @@ export default {
                   return child.id.get() !== nodeId;
                 })
                 .map(el => {
+                  // console.log("el", el);
                   return {
+                    id: el.id.get(),
                     name: el.name.get(),
-                    color: el.color.get(),
+                    color: el.color ? el.color.get() : "#000000",
                     children: el.childrenIds
                   };
                 });
@@ -280,7 +311,7 @@ export default {
   watch: {
     search: function(newValue) {
       newValue = newValue.trim();
-      console.log("newValue", newValue);
+      // console.log("newValue", newValue);
       if (newValue.length === 0) {
         this.tempList = this.data;
       } else {
@@ -335,11 +366,14 @@ export default {
 .empty {
   /* width: 100%;
   height: 200px; */
+  width: 40%;
+  text-align: center;
   font-size: 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  margin: auto;
 }
 
 .listContainer {
