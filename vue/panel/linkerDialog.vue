@@ -93,7 +93,7 @@
 
     <div class="_container empty"
          v-if="loaded && !error">
-      Loading...
+      <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
     </div>
 
     <div class="_container empty"
