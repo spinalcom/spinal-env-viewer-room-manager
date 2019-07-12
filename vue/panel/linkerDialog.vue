@@ -93,7 +93,8 @@
 
     <div class="_container empty"
          v-if="loaded && !error">
-      <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
+      <md-progress-spinner class="spiner"
+                           md-mode="indeterminate"></md-progress-spinner>
     </div>
 
     <div class="_container empty"
@@ -400,6 +401,12 @@ export default {
   width: 24px;
   height: 24px;
   border: 1px solid white;
+}
+
+.spiner {
+  position: absolute;
+  top: calc(50% - 30px);
+  right: calc(50% - 30px);
 }
 </style>
 
