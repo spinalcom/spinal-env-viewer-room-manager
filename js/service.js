@@ -65,7 +65,8 @@ let groupService = {
       })
     );
   },
-  addElement(contextId, elementId, elementType, elementName, iconName) {
+  addElement(contextId, elementId, elementType, elementName, iconName,
+    color) {
 
     let typeAndRelation = this.getTypeAndRelation(elementType);
 
@@ -81,6 +82,10 @@ let groupService = {
 
       if (iconName) {
         info["icon"] = iconName;
+      }
+
+      if (color) {
+        info["color"] = color;
       }
 
       let childId = SpinalGraphService.createNode(info,

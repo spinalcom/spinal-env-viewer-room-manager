@@ -4,13 +4,20 @@
              @md-closed="closeDialog(false)">
     <md-dialog-title>{{title}}</md-dialog-title>
     <md-dialog-content>
+
+      <md-field>
+        <label>Name</label>
+        <md-input v-model="inputValue"></md-input>
+      </md-field>
+
       <chrome-picker v-model="color" />
     </md-dialog-content>
     <md-dialog-actions>
       <md-button class="md-primary"
                  @click="closeDialog(false)">Close</md-button>
       <md-button class="md-primary"
-                 @click="closeDialog(true)">Save</md-button>
+                 @click="closeDialog(true)"
+                 :disabled="inputValue.trim().length === 0">Save</md-button>
     </md-dialog-actions>
   </md-dialog>
 </template>
@@ -30,12 +37,14 @@ export default {
       showDialog: true,
       title: "",
       color: "#000000",
-      node: null
+      node: null,
+      inputValue: ""
     };
   },
   methods: {
     opened(option) {
-      this.title = option.title;
+      this.title = `Edit ${option.title}`;
+      this.inputValue = option.title;
       this.color = option.color;
       this.node = option.selectedNode;
     },
@@ -47,6 +56,8 @@ export default {
     removed(closed) {
       if (closed) {
         let realNode = SpinalGraphService.getRealNode(this.node.id.get());
+
+        realNode.info.name.set(this.inputValue.trim());
 
         if (!realNode.info.color) {
           realNode.info.add_attr("color", this.color.hex);

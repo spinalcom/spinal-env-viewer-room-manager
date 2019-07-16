@@ -1,4 +1,6 @@
-import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
+import {
+  SpinalContextApp
+} from "spinal-env-viewer-context-menu-service";
 
 import {
   ROOMS_GROUP_CONTEXT,
@@ -7,11 +9,13 @@ import {
   ROOMS_GROUP
 } from "../js/service";
 
-import { spinalPanelManagerService } from "spinal-env-viewer-panel-manager-service";
+import {
+  spinalPanelManagerService
+} from "spinal-env-viewer-panel-manager-service";
 
 class ColorConfig extends SpinalContextApp {
   constructor() {
-    super("Config color", "This button allow to change rooms color", {
+    super("Edit", "This button allows  to edit group", {
       icon: "colorize",
       icon_type: "in",
       backgroundColor: "#FF0000",
@@ -41,9 +45,8 @@ class ColorConfig extends SpinalContextApp {
   action(option) {
     let params = {
       title: option.selectedNode.name.get(),
-      color: option.selectedNode.color
-        ? option.selectedNode.color.get()
-        : "#000000",
+      color: option.selectedNode.color ?
+        option.selectedNode.color.get() : "#000000",
       selectedNode: option.selectedNode
     };
     spinalPanelManagerService.openPanel("colorConfigDialog", params);

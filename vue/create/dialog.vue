@@ -31,6 +31,9 @@
         <icon-component @selectIcon="selectIcon"
                         v-if="isCategory()"></icon-component>
 
+        <chrome-picker v-if="isGroup()"
+                       v-model="color" />
+
       </div>
 
     </md-dialog-content>
@@ -46,11 +49,15 @@
 </template>
 
 <script>
+import { Chrome } from "vue-color";
+
 import {
   ROOMS_GROUP_CONTEXT,
   EQUIPMENTS_GROUP_CONTEXT,
   EQUIPMENTS_GROUP,
   ROOMS_GROUP,
+  ROOMS_CATEGORY,
+  EQUIPMENTS_CATEGORY,
   groupService
 } from "../../js/service";
 
@@ -67,7 +74,8 @@ export default {
   name: "createGroupContextDialog",
   props: ["onFinised"],
   components: {
-    "icon-component": iconComponent
+    "icon-component": iconComponent,
+    "chrome-picker": Chrome
   },
   data() {
     this.hide;
@@ -87,6 +95,7 @@ export default {
       title: "",
       inputValue: "",
       type: "",
+      color: null,
       typeSelected: ROOMS_GROUP_CONTEXT,
       parent: undefined,
       contextId: null
@@ -102,6 +111,8 @@ export default {
       this.type = option.type;
       this.parent = option.selectedNode;
       this.contextId = option.contextId;
+
+      this.color = this.isGroup() ? { hex: "#000000" } : undefined;
 
       if (this.hide) this.onFinised(true);
       // !this.isRoomsGroup() ? (this.showDialog = true) : this.removed(true);
@@ -122,7 +133,8 @@ export default {
             this.parent.id.get(),
             type,
             value,
-            this.iconSelected
+            this.iconSelected,
+            this.color ? this.color.hex : undefined
           );
           // }
         } else {
@@ -136,14 +148,15 @@ export default {
       }
       this.showDialog = false;
     },
-    isRoomsGroup() {
-      return this.parent && this.parent.type.get() === EQUIPMENTS_GROUP;
-    },
 
     closeDialog(closeResult) {
       if (typeof this.onFinised === "function") {
         this.onFinised(closeResult);
       }
+    },
+
+    isRoomsGroup() {
+      return this.parent && this.parent.type.get() === EQUIPMENTS_GROUP;
     },
 
     addBimObject() {
@@ -240,6 +253,14 @@ export default {
     },
     selectIcon(icon) {
       this.iconSelected = icon;
+    },
+
+    isGroup() {
+      return (
+        this.parent &&
+        (this.parent.type.get() === ROOMS_CATEGORY ||
+          this.parent.type.get() === EQUIPMENTS_CATEGORY)
+      );
     }
   },
   filters: {
