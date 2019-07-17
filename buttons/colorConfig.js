@@ -6,7 +6,9 @@ import {
   ROOMS_GROUP_CONTEXT,
   EQUIPMENTS_GROUP_CONTEXT,
   EQUIPMENTS_GROUP,
-  ROOMS_GROUP
+  ROOMS_GROUP,
+  EQUIPMENTS_CATEGORY,
+  ROOMS_CATEGORY
 } from "../js/service";
 
 import {
@@ -16,7 +18,7 @@ import {
 class ColorConfig extends SpinalContextApp {
   constructor() {
     super("Edit", "This button allows  to edit group", {
-      icon: "colorize",
+      icon: "edit",
       icon_type: "in",
       backgroundColor: "#FF0000",
       fontColor: "#FFFFFF"
@@ -24,11 +26,18 @@ class ColorConfig extends SpinalContextApp {
   }
 
   display(contextType, selectedNodeType) {
+
+    let tempList = [
+      EQUIPMENTS_GROUP,
+      ROOMS_GROUP,
+      EQUIPMENTS_CATEGORY,
+      ROOMS_CATEGORY
+    ];
+
     return (
-      (contextType === ROOMS_GROUP_CONTEXT &&
-        selectedNodeType === ROOMS_GROUP) ||
-      (contextType === EQUIPMENTS_GROUP_CONTEXT &&
-        selectedNodeType === EQUIPMENTS_GROUP)
+      (contextType === ROOMS_GROUP_CONTEXT ||
+        contextType === EQUIPMENTS_GROUP_CONTEXT) && (tempList.indexOf(
+        selectedNodeType) !== -1)
     );
   }
 
@@ -43,23 +52,33 @@ class ColorConfig extends SpinalContextApp {
   }
 
   action(option) {
+
+
+    let type = option.selectedNode.type.get();
+
     let params = {
-      title: option.selectedNode.name.get(),
-      color: option.selectedNode.color ?
-        option.selectedNode.color.get() : "#000000",
+      edit: true,
+      title: `Edit ${option.selectedNode.name.get()}`,
+      type: "element",
+      contextId: option.context.id.get(),
       selectedNode: option.selectedNode
     };
-    spinalPanelManagerService.openPanel("colorConfigDialog", params);
-    // let photoshop = new Photoshop();
-    // let instance = new photoshopComponent({
-    //   propsData: {
-    //     head: color: "#000000",
-    //     value: "#000000"
-    //   }
-    // });
 
-    // instance.$mount();
-    // document.getElementsByTagName("body")[0].appendChild(instance.$el);
+    if (type === ROOMS_GROUP || type === EQUIPMENTS_GROUP) {
+      params["color"] = option.selectedNode.color ? option.selectedNode
+        .color.get() : "#000000";
+    } else if (type === ROOMS_CATEGORY || type === EQUIPMENTS_CATEGORY) {
+      params["iconSelected"] = option.selectedNode.icon ? option.selectedNode
+        .icon.get() : undefined;
+    }
+
+    spinalPanelManagerService.openPanel("createGroupContextDialog",
+      params);
+
+    // spinalPanelManagerService.openPanel("colorConfigDialog", params);
+
+
+
   }
 }
 

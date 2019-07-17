@@ -29,6 +29,7 @@
         </md-field>
 
         <icon-component @selectIcon="selectIcon"
+                        :selected="iconSelected"
                         v-if="isCategory()"></icon-component>
 
         <chrome-picker v-if="isGroup()"
@@ -89,6 +90,8 @@ export default {
         type: EQUIPMENTS_GROUP_CONTEXT
       }
     ];
+    this.edit;
+
     return {
       iconSelected: undefined,
       showDialog: false,
@@ -107,15 +110,24 @@ export default {
 
       this.showDialog = typeof option.hide === "undefined" ? true : false;
 
+      this.edit = option.edit;
+
       this.title = option.title;
       this.type = option.type;
-      this.parent = option.selectedNode;
       this.contextId = option.contextId;
 
-      this.color = this.isGroup() ? { hex: "#000000" } : undefined;
+      if (typeof this.edit === "undefined") {
+        this.parent = option.selectedNode;
+
+        this.color = this.isGroup() ? "#000000" : undefined;
+      } else {
+        this.parent = option.selectedNode;
+        this.inputValue = option.selectedNode.name.get();
+        this.color = option.color;
+        this.iconSelected = option.iconSelected;
+      }
 
       if (this.hide) this.onFinised(true);
-      // !this.isRoomsGroup() ? (this.showDialog = true) : this.removed(true);
     },
 
     removed(closed) {
@@ -125,18 +137,42 @@ export default {
         if (typeof this.parent === "undefined") {
           groupService.createGroupContext(value, this.typeSelected);
         } else if (typeof this.hide === "undefined") {
-          let type = this.parent.type.get();
+          if (typeof this.edit === "undefined") {
+            let type = this.parent.type.get();
 
-          // if (this.parent.type.get() === ROOMS_GROUP) {
-          groupService.addElement(
-            this.contextId,
-            this.parent.id.get(),
-            type,
-            value,
-            this.iconSelected,
-            this.color ? this.color.hex : undefined
-          );
-          // }
+            groupService.addElement(
+              this.contextId,
+              this.parent.id.get(),
+              type,
+              value,
+              this.iconSelected,
+              this.color ? this.color.hex : undefined
+            );
+          } else {
+            let realNode = SpinalGraphService.getRealNode(this.parent.id.get());
+
+            realNode.info.name.set(this.inputValue);
+
+            if (this.color) {
+              let color = this.color.hex || this.color;
+
+              if (realNode.info.color) {
+                realNode.info.color.set(color);
+              } else {
+                realNode.info.add_attr({
+                  color: color
+                });
+              }
+            } else if (this.iconSelected) {
+              if (realNode.info.icon) {
+                realNode.info.icon.set(this.iconSelected);
+              } else {
+                realNode.info.add_attr({
+                  icon: this.iconSelected
+                });
+              }
+            }
+          }
         } else {
           let type = this.parent.type.get();
           if (type === EQUIPMENTS_GROUP) {
@@ -239,7 +275,12 @@ export default {
         type = this.parent.type.get();
       }
 
-      return type === ROOMS_GROUP_CONTEXT || type === EQUIPMENTS_GROUP_CONTEXT;
+      return (
+        type === ROOMS_GROUP_CONTEXT ||
+        type === EQUIPMENTS_GROUP_CONTEXT ||
+        (typeof this.edit !== "undefined" &&
+          (type === ROOMS_CATEGORY || type === EQUIPMENTS_CATEGORY))
+      );
     },
 
     isDisabled() {
@@ -256,11 +297,17 @@ export default {
     },
 
     isGroup() {
-      return (
-        this.parent &&
-        (this.parent.type.get() === ROOMS_CATEGORY ||
-          this.parent.type.get() === EQUIPMENTS_CATEGORY)
-      );
+      if (typeof this.edit === "undefined") {
+        return (
+          this.parent &&
+          (this.parent.type.get() === ROOMS_CATEGORY ||
+            this.parent.type.get() === EQUIPMENTS_CATEGORY)
+        );
+      } else {
+        let type = this.parent.type.get();
+
+        return type === ROOMS_GROUP || type === EQUIPMENTS_GROUP;
+      }
     }
   },
   filters: {

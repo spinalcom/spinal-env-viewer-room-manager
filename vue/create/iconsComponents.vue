@@ -49,6 +49,11 @@ import * as allIcons from "../../js/icons.json";
 
 export default {
   name: "iconComponent",
+  props: {
+    selected: {
+      type: String
+    }
+  },
   data() {
     this.allIcons = Object.values(allIcons);
     this.categories = this.getAllCategories();
@@ -57,6 +62,11 @@ export default {
       iconSelected: null,
       categorySelected: "none"
     };
+  },
+  mounted() {
+    if (typeof this.selected !== "undefined") {
+      this.iconSelected = this.selected;
+    }
   },
   methods: {
     filterIcons() {
