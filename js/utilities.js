@@ -172,7 +172,8 @@ let utilities = {
           child.dbid.get(),
           // eslint-disable-next-line no-undef
           new THREE.Vector4(color.r / 255, color.g / 255, color.b /
-            255, 0.7)
+            255, 0.7),
+          window.spinal.BimObjectService.currentModel
         );
 
       });
