@@ -221,23 +221,25 @@ export default {
                 element.name,
                 model
               ).then(res => {
-                if (res) {
-                  window.spinal.BimObjectService.getBIMObject(
-                    element.dbId,
-                    model
-                  ).then(bimObject => {
-                    /////////////////////////////////////////////////////
-                    //              EDIT ME TO ADD                     //
-                    /////////////////////////////////////////////////////
-                    if (bimObject) {
-                      groupService.linkElementToGroup(
-                        this.parent.id.get(),
-                        bimObject.id.get(),
-                        this.contextId
-                      );
-                    }
-                  });
-                }
+                console.log("res", res);
+                // if (res) {
+                window.spinal.BimObjectService.getBIMObject(
+                  element.dbId,
+                  model
+                ).then(bimObject => {
+                  console.log("bimObject", bimObject);
+                  /////////////////////////////////////////////////////
+                  //              EDIT ME TO ADD                     //
+                  /////////////////////////////////////////////////////
+                  if (bimObject) {
+                    groupService.linkElementToGroup(
+                      this.parent.id.get(),
+                      bimObject.id.get(),
+                      this.contextId
+                    );
+                  }
+                });
+                // }
               });
             });
           }
