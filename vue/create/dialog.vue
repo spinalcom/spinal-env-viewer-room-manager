@@ -64,7 +64,7 @@ import {
 
 // import bimObjectService from "spinal-env-viewer-plugin-bimobjectservice";
 
-const bimObjectService = window.spinal.BimObjectService;
+// const bimObjectService = window.spinal.BimObjectService;
 
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 
@@ -216,26 +216,29 @@ export default {
           },
           el => {
             el.forEach(element => {
-              bimObjectService
-                .createBIMObject(element.dbId, element.name, model)
-                .then(res => {
-                  if (res) {
-                    bimObjectService
-                      .getBIMObject(element.dbId, model)
-                      .then(bimObject => {
-                        /////////////////////////////////////////////////////
-                        //              EDIT ME TO ADD                     //
-                        /////////////////////////////////////////////////////
-                        if (bimObject) {
-                          groupService.linkElementToGroup(
-                            this.parent.id.get(),
-                            bimObject.id.get(),
-                            this.contextId
-                          );
-                        }
-                      });
-                  }
-                });
+              window.spinal.BimObjectService.createBIMObject(
+                element.dbId,
+                element.name,
+                model
+              ).then(res => {
+                if (res) {
+                  window.spinal.BimObjectService.getBIMObject(
+                    element.dbId,
+                    model
+                  ).then(bimObject => {
+                    /////////////////////////////////////////////////////
+                    //              EDIT ME TO ADD                     //
+                    /////////////////////////////////////////////////////
+                    if (bimObject) {
+                      groupService.linkElementToGroup(
+                        this.parent.id.get(),
+                        bimObject.id.get(),
+                        this.contextId
+                      );
+                    }
+                  });
+                }
+              });
             });
           }
         );
@@ -283,16 +286,17 @@ export default {
     },
 
     createBimObjectNode(bimElement) {
-      bimObjectService
-        .createBIMObject(bimElement.dbId, bimElement.name)
-        .then(el => {
-          SpinalGraphService._addNode(el);
-          groupService.linkElementToGroup(
-            this.parent.id.get(),
-            el.info.id.get(),
-            this.contextId
-          );
-        });
+      window.spinal.BimObjectService.createBIMObject(
+        bimElement.dbId,
+        bimElement.name
+      ).then(el => {
+        SpinalGraphService._addNode(el);
+        groupService.linkElementToGroup(
+          this.parent.id.get(),
+          el.info.id.get(),
+          this.contextId
+        );
+      });
 
       // Promise.all(selected).then(res => {
       //   res.forEach(el => {
