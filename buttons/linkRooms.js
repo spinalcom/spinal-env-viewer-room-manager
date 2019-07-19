@@ -48,8 +48,8 @@ class LinkRooms extends SpinalContextApp {
       // EQUIPMENTS_GROUP_CONTEXT, /* Commenter pour desactiver le panel global */
       // ROOMS_CATEGORY, /* Commenter pour desactiver le panel global */
       // EQUIPMENTS_CATEGORY, /* Commenter pour desactiver le panel global */
-      ROOMS_GROUP,
-      EQUIPMENTS_GROUP
+      ROOMS_GROUP
+      // EQUIPMENTS_GROUP
     ]
 
     return Promise.resolve(tempList.indexOf(nodeType));

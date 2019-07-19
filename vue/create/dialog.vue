@@ -62,12 +62,15 @@ import {
   groupService
 } from "../../js/service";
 
-import bimObjectService from "spinal-env-viewer-plugin-bimobjectservice";
+// import bimObjectService from "spinal-env-viewer-plugin-bimobjectservice";
+
+const bimObjectService = window.spinal.BimObjectService;
+
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 
 import iconComponent from "./iconsComponents.vue";
 
-import { bimObjectManagerService } from "spinal-env-viewer-bim-manager-service";
+// import { bimObjectManagerService } from "spinal-env-viewer-bim-manager-service";
 
 // const viewer = window.spinal.ForgeViewer.viewer;
 
@@ -203,45 +206,80 @@ export default {
         return;
       }
 
-      // let tempSelected = [];
+      for (let idx = 0; idx < selected.length; idx++) {
+        const { model, selection } = selected[idx];
 
-      // selected.forEach(el => {
-      //   console.log("el", el);
-      //   tempSelected.push(
-      //     ...bimObjectManagerService.getLeafDbIds(el.model, el.selection)
+        model.getBulkProperties(
+          selection,
+          {
+            propFilter: ["name"]
+          },
+          el => {
+            el.forEach(element => {
+              bimObjectService
+                .createBIMObject(element.dbId, element.name, model)
+                .then(res => {
+                  if (res) {
+                    bimObjectService
+                      .getBIMObject(element.dbId, model)
+                      .then(bimObject => {
+                        /////////////////////////////////////////////////////
+                        //              EDIT ME TO ADD                     //
+                        /////////////////////////////////////////////////////
+                        if (bimObject) {
+                          groupService.linkElementToGroup(
+                            this.parent.id.get(),
+                            bimObject.id.get(),
+                            this.contextId
+                          );
+                        }
+                      });
+                  }
+                });
+            });
+          }
+        );
+      }
+
+      // // let tempSelected = [];
+
+      // // selected.forEach(el => {
+      // //   console.log("el", el);
+      // //   tempSelected.push(
+      // //     ...bimObjectManagerService.getLeafDbIds(el.model, el.selection)
+      // //   );
+      // // });
+
+      // selected = selected.map(el => {
+      //   let leafDbIds = bimObjectManagerService.getLeafDbIds(
+      //     el.model,
+      //     el.selection
       //   );
+
+      //   return bimObjectManagerService.getBimObjectProperties(leafDbIds);
       // });
 
-      selected = selected.map(el => {
-        let leafDbIds = bimObjectManagerService.getLeafDbIds(
-          el.model,
-          el.selection
-        );
-
-        return bimObjectManagerService.getBimObjectProperties(leafDbIds);
-      });
-
-      Promise.all(selected).then(values => {
-        values.forEach(res => {
-          res.forEach(n => {
-            n.properties.forEach(el => {
-              this.createBimObjectNode(el);
-            });
-          });
-        });
-      });
-
-      // window.spinal.ForgeViewer.viewer.model.getBulkProperties(
-      //   tempSelected,
-      //   {
-      //     propFilter: ["name"]
-      //   },
-      //   res => {
-      //     res.forEach(el => {
-      //       this.createBimObjectNode(el);
+      // Promise.all(selected).then(values => {
+      //   values.forEach(res => {
+      //     res.forEach(n => {
+      //       n.properties.forEach(el => {
+      //         this.createBimObjectNode(el);
+      //       });
       //     });
-      //   }
-      // );
+      //   });
+      // });
+
+      // // window.spinal.ForgeViewer.viewer.model.getBulkProperties(
+      // //   tempSelected,
+      // //   {
+      // //     propFilter: ["name"]
+      // //   },
+      // //   res => {
+      // //     res.forEach(el => {
+      // //       this.createBimObjectNode(el);
+      // //     });
+      // //   }
+      // // );
     },
 
     createBimObjectNode(bimElement) {

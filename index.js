@@ -31,15 +31,15 @@ spinalContextMenuService.registerApp(SIDEBAR, new LinkRooms(), [3]);
 //                                     TESTS                                                   //
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-import {
-  bimObjectManagerService
-} from "../spinal-env-viewer-bim-manager-service";
+// import {
+//   bimObjectManagerService
+// } from "../spinal-env-viewer-bim-manager-service";
 
 // import AddBtnFunction from "../spinal-env-viewer-plugin-filter";
 
-window.tests = {
-  bimObjectManagerService: bimObjectManagerService,
-}
+// window.tests = {
+//   bimObjectManagerService: bimObjectManagerService,
+// }
 
 
 // document.onreadystatechange = () => {
