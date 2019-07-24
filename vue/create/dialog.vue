@@ -70,7 +70,7 @@ import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 
 import iconComponent from "./iconsComponents.vue";
 
-// import { bimObjectManagerService } from "spinal-env-viewer-bim-manager-service";
+import { bimObjectManagerService } from "spinal-env-viewer-bim-manager-service";
 
 // const viewer = window.spinal.ForgeViewer.viewer;
 
@@ -199,52 +199,56 @@ export default {
     },
 
     addBimObject() {
-      let selected = window.spinal.ForgeViewer.viewer.getAggregateSelection();
+      let selections = window.spinal.ForgeViewer.viewer.getAggregateSelection();
 
-      if (selected.length === 0) {
+      if (selections.length === 0) {
         alert("select an item");
         return;
       }
 
-      for (let idx = 0; idx < selected.length; idx++) {
-        const { model, selection } = selected[idx];
+      selections = selections.map(el => {
+        return bimObjectManagerService.getLeafDbIds(el.model, el.selection);
+      });
 
-        model.getBulkProperties(
-          selection,
-          {
-            propFilter: ["name"]
-          },
-          el => {
-            el.forEach(element => {
-              window.spinal.BimObjectService.createBIMObject(
-                element.dbId,
-                element.name,
-                model
-              ).then(res => {
-                console.log("res", res);
-                // if (res) {
-                window.spinal.BimObjectService.getBIMObject(
+      Promise.all(selections).then(selected => {
+        for (let idx = 0; idx < selected.length; idx++) {
+          const { model, selection } = selected[idx];
+
+          model.getBulkProperties(
+            selection,
+            {
+              propFilter: ["name"]
+            },
+            el => {
+              el.forEach(element => {
+                window.spinal.BimObjectService.createBIMObject(
                   element.dbId,
+                  element.name,
                   model
-                ).then(bimObject => {
-                  console.log("bimObject", bimObject);
-                  /////////////////////////////////////////////////////
-                  //              EDIT ME TO ADD                     //
-                  /////////////////////////////////////////////////////
-                  if (bimObject) {
-                    groupService.linkElementToGroup(
-                      this.parent.id.get(),
-                      bimObject.id.get(),
-                      this.contextId
-                    );
-                  }
+                ).then(res => {
+                  // if (res) {
+                  window.spinal.BimObjectService.getBIMObject(
+                    element.dbId,
+                    model
+                  ).then(bimObject => {
+                    /////////////////////////////////////////////////////
+                    //              EDIT ME TO ADD                     //
+                    /////////////////////////////////////////////////////
+                    if (bimObject) {
+                      groupService.linkElementToGroup(
+                        this.parent.id.get(),
+                        bimObject.id.get(),
+                        this.contextId
+                      );
+                    }
+                  });
+                  // }
                 });
-                // }
               });
-            });
-          }
-        );
-      }
+            }
+          );
+        }
+      });
 
       // // let tempSelected = [];
 
