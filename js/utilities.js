@@ -16,7 +16,10 @@ import {
   SpinalGraphService
 } from "spinal-env-viewer-graph-service";
 
-import bimObjectService from "spinal-env-viewer-plugin-bimobjectservice";
+import {
+  BIM_OBJECT_TYPE
+} from "spinal-env-viewer-plugin-forge/dist/Constants";
+
 import geographicService from "spinal-env-viewer-context-geographic-service";
 
 
@@ -70,8 +73,7 @@ let utilities = {
     let type = nodeInfo.type.get();
 
 
-    if (type === bimObjectService.constants
-      .BIM_OBJECT_NODE_TYPE) {
+    if (type === BIM_OBJECT_TYPE) {
       return Promise.resolve([nodeInfo]);
     } else if (type === geographicService.constants
       .ROOM_TYPE) {
@@ -91,8 +93,7 @@ let utilities = {
 
 
       return SpinalGraphService.findNodes(nodeId, relations, (node) => {
-        return node.getType().get() === bimObjectService.constants
-          .BIM_OBJECT_NODE_TYPE
+        return node.getType().get() === BIM_OBJECT_TYPE
       }).then(res => {
         return res.map(el => {
           SpinalGraphService._addNode(el);
@@ -173,6 +174,8 @@ let utilities = {
           // eslint-disable-next-line no-undef
           new THREE.Vector4(color.r / 255, color.g / 255, color.b /
             255, 0.7),
+          // window.spinal.BimObjectService.getModel(child.dbid.get(),
+          //   child.bimFileId.get())
           window.spinal.BimObjectService.currentModel
         );
 
