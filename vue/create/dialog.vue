@@ -237,7 +237,9 @@ export default {
                     if (bimObject) {
                       groupService.linkElementToGroup(
                         this.parent.id.get(),
-                        bimObject.id.get(),
+                        bimObject.id
+                          ? bimObject.id.get()
+                          : bimObject.info.id.get(),
                         this.contextId
                       );
                     }
