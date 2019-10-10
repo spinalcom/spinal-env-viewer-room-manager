@@ -49,6 +49,8 @@ class ViewChildren extends SpinalContextApp {
       this.isColored = true;
       utilities.colorItem(option.selectedNode);
     }
+
+    window.NOP_VIEWER.impl.invalidate(0, 1, 0)
   }
 
 }

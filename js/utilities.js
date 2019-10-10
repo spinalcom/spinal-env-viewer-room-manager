@@ -153,6 +153,7 @@ let utilities = {
 
   colorGroup(groupId, argColor) {
     this.getBimObjects(groupId).then(res => {
+
       let color = typeof argColor !== "undefined" ? this
         ._convertHexColorToRGB(argColor) : this._convertHexColorToRGB(
           "#000000");
@@ -169,14 +170,12 @@ let utilities = {
 
         BimElementsColor.set(child.dbid.get(), BimColors);
 
-        window.spinal.ForgeViewer.viewer.setThemingColor(
-          child.dbid.get(),
-          // eslint-disable-next-line no-undef
-          new THREE.Vector4(color.r / 255, color.g / 255, color.b /
-            255, 0.7),
-          // window.spinal.BimObjectService.getModel(child.dbid.get(),
-          //   child.bimFileId.get())
-          window.spinal.BimObjectService.currentModel
+        let model = window.spinal.BimObjectService.getModelByBimfile(
+          child.bimFileId.get());
+
+        model.setThemingColor(child.dbid.get(), new THREE.Vector4(
+            color.r / 255, color.g / 255, color.b / 255, 0.7, true)
+
         );
 
       });
@@ -188,10 +187,15 @@ let utilities = {
     ItemColoredMap.delete(groupId);
     this.getBimObjects(groupId).then(res => {
       res.forEach(child => {
-        window.spinal.ForgeViewer.viewer.setThemingColor(
+
+        let model = window.spinal.BimObjectService.getModelByBimfile(
+          child.bimFileId.get());
+
+        model.setThemingColor(
           child.dbid.get(),
           // eslint-disable-next-line no-undef
-          new THREE.Vector4(0, 0, 0, 0)
+          new THREE.Vector4(0, 0, 0, 0),
+          true
         );
 
         let allColors = BimElementsColor.get(child.dbid.get());
@@ -203,7 +207,7 @@ let utilities = {
 
           if (allColors.length > 0) {
             let color = allColors[0].color;
-            window.spinal.ForgeViewer.viewer.setThemingColor(
+            model.setThemingColor(
               child.dbid.get(),
               // eslint-disable-next-line no-undef
               new THREE.Vector4(
@@ -211,7 +215,8 @@ let utilities = {
                 color.g / 255,
                 color.b / 255,
                 0.7
-              )
+              ),
+              true
             );
           }
         }
