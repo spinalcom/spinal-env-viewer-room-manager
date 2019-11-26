@@ -72,6 +72,8 @@ import iconComponent from "./iconsComponents.vue";
 
 import { bimObjectManagerService } from "spinal-env-viewer-bim-manager-service";
 
+import EventBus from "../../js/event.js";
+
 // const viewer = window.spinal.ForgeViewer.viewer;
 
 export default {
@@ -138,19 +140,25 @@ export default {
         let value = this.inputValue.trim();
 
         if (typeof this.parent === "undefined") {
-          groupService.createGroupContext(value, this.typeSelected);
+          groupService.createGroupContext(value, this.typeSelected).then(() => {
+            this.sentEvent();
+          });
         } else if (typeof this.hide === "undefined") {
           if (typeof this.edit === "undefined") {
             let type = this.parent.type.get();
 
-            groupService.addElement(
-              this.contextId,
-              this.parent.id.get(),
-              type,
-              value,
-              this.iconSelected,
-              this.color ? this.color.hex : undefined
-            );
+            groupService
+              .addElement(
+                this.contextId,
+                this.parent.id.get(),
+                type,
+                value,
+                this.iconSelected,
+                this.color ? this.color.hex : undefined
+              )
+              .then(() => {
+                this.sentEvent();
+              });
           } else {
             let realNode = SpinalGraphService.getRealNode(this.parent.id.get());
 
@@ -358,6 +366,10 @@ export default {
 
         return type === ROOMS_GROUP || type === EQUIPMENTS_GROUP;
       }
+    },
+
+    sentEvent() {
+      EventBus.$emit("itemCreated");
     }
   },
   filters: {
