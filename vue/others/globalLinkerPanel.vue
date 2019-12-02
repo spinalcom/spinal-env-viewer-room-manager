@@ -21,16 +21,7 @@
 </template>
 
 <script>
-import {
-  groupService,
-  ROOMS_GROUP_CONTEXT,
-  ROOMS_CATEGORY_RELATION,
-  EQUIPMENTS_CATEGORY_RELATION,
-  ROOMS_GROUP_RELATION,
-  EQUIPMENTS_GROUP_RELATION,
-  ROOMS_GROUP,
-  EQUIPMENTS_GROUP
-} from "../../js/service";
+import { groupService } from "../../services/service";
 
 import tableComponent from "./tableComponent.vue";
 import { Lst } from "spinal-core-connectorjs_type";
@@ -103,7 +94,7 @@ export default {
         let contextType = SpinalGraphService.getInfo(this.contextId).type.get();
 
         let type =
-          contextType === ROOMS_GROUP_CONTEXT
+          contextType === groupService.constants.ROOMS_GROUP_CONTEXT
             ? geographicService.constants.ROOM_TYPE
             : geographicService.constants.EQUIPMENT_TYPE;
 
@@ -147,18 +138,18 @@ export default {
     getData(nodeId, contextId) {
       const contextType = SpinalGraphService.getInfo(contextId).type.get();
 
-      let selectedContextRelation =
-        contextType === ROOMS_GROUP_CONTEXT
-          ? [ROOMS_GROUP_RELATION, ROOMS_CATEGORY_RELATION]
-          : [EQUIPMENTS_GROUP_RELATION, EQUIPMENTS_CATEGORY_RELATION];
+      let selectedContextRelation = [
+        groupService.constants.CATEGORY_TO_GROUP_RELATION,
+        groupService.constants
+      ];
 
       let refContextName =
-        contextType === ROOMS_GROUP_CONTEXT
+        contextType === groupService.constants.ROOMS_GROUP_CONTEXT
           ? geographicService.constants.ROOM_REFERENCE_CONTEXT
           : bimobjectservice.constants.BIM_OBJECT_CONTEXT_TYPE;
 
       let refContextRelation =
-        contextType === ROOMS_GROUP_CONTEXT
+        contextType === groupService.constants.ROOMS_GROUP_CONTEXT
           ? geographicService.constants.ROOM_RELATION
           : bimobjectservice.constants.BIM_OBJECT_RELATION_NAME;
 
@@ -169,7 +160,10 @@ export default {
         selectedContextRelation,
         node => {
           let type = node.getType().get();
-          return type === ROOMS_GROUP || type === EQUIPMENTS_GROUP;
+          return (
+            type === groupService.constants.ROOMS_GROUP ||
+            type === groupService.constants.EQUIPMENTS_GROUP
+          );
         }
       ).then(async res => {
         return {

@@ -52,19 +52,12 @@
 <script>
 import { Chrome } from "vue-color";
 
-import {
-  ROOMS_GROUP_CONTEXT,
-  EQUIPMENTS_GROUP_CONTEXT,
-  EQUIPMENTS_GROUP,
-  ROOMS_GROUP,
-  ROOMS_CATEGORY,
-  EQUIPMENTS_CATEGORY,
-  groupService
-} from "../../js/service";
+import { groupService } from "../../services/service";
 
 // import bimObjectService from "spinal-env-viewer-plugin-bimobjectservice";
 
 // const bimObjectService = window.spinal.BimObjectService;
+import { spinalPanelManagerService } from "spinal-env-viewer-panel-manager-service";
 
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 
@@ -75,6 +68,9 @@ import { bimObjectManagerService } from "spinal-env-viewer-bim-manager-service";
 import EventBus from "../../js/event.js";
 
 // const viewer = window.spinal.ForgeViewer.viewer;
+
+import geographicService from "spinal-env-viewer-context-geographic-service";
+import bimobjectservice from "spinal-env-viewer-plugin-bimobjectservice";
 
 export default {
   name: "createGroupContextDialog",
@@ -88,11 +84,15 @@ export default {
     this.GroupTypes = [
       {
         name: "Rooms Group",
-        type: ROOMS_GROUP_CONTEXT
+        type: groupService.constants.ROOMS_GROUP_CONTEXT
       },
       {
         name: "Equipments Group",
-        type: EQUIPMENTS_GROUP_CONTEXT
+        type: groupService.constants.EQUIPMENTS_GROUP_CONTEXT
+      },
+      {
+        name: "Endpoint Group",
+        type: groupService.constants.ENDPOINTS_GROUP_CONTEXT
       }
     ];
     this.edit;
@@ -104,7 +104,7 @@ export default {
       inputValue: "",
       type: "",
       color: null,
-      typeSelected: ROOMS_GROUP_CONTEXT,
+      typeSelected: groupService.constants.ROOMS_GROUP_CONTEXT,
       parent: undefined,
       contextId: null
     };
@@ -186,10 +186,12 @@ export default {
           }
         } else {
           let type = this.parent.type.get();
-          if (type === EQUIPMENTS_GROUP) {
+          if (type === groupService.constants.EQUIPMENTS_GROUP) {
             this.addBimObject();
-          } else if (type === ROOMS_GROUP) {
+          } else if (type === groupService.constants.ROOMS_GROUP) {
             this.addRooms();
+          } else {
+            console.log("endpoints");
           }
         }
       }
@@ -203,7 +205,10 @@ export default {
     },
 
     isRoomsGroup() {
-      return this.parent && this.parent.type.get() === EQUIPMENTS_GROUP;
+      return (
+        this.parent &&
+        this.parent.type.get() === groupService.constants.EQUIPMENTS_GROUP
+      );
     },
 
     addBimObject() {
@@ -233,7 +238,7 @@ export default {
                   element.dbId,
                   element.name,
                   model
-                ).then(res => {
+                ).then(() => {
                   // if (res) {
                   window.spinal.BimObjectService.getBIMObject(
                     element.dbId,
@@ -325,7 +330,48 @@ export default {
       //   });
       // });
     },
-    addRooms() {},
+    addRooms() {
+      let nodeType = this.parent.type.get();
+      let contextId = this.contextId;
+      let nodeId = this.parent.id.get();
+
+      let tempList = [
+        ...groupService.constants.GROUPS_TYPES,
+        groupService.constants.CATEGORY_TYPE
+      ];
+
+      if (tempList.indexOf(nodeType) === -1) {
+        spinalPanelManagerService.openPanel(
+          "linkRoomPanel",
+          this.getParameter(contextId, nodeId, nodeType)
+        );
+      } else {
+        spinalPanelManagerService.openPanel("globalLinkRoomPanel", {
+          nodeId: nodeId,
+          contextId: contextId
+        });
+      }
+    },
+    getParameter(contextId, nodeId, nodeType) {
+      let obj = {
+        context:
+          nodeType === groupService.constants.ROOMS_GROUP
+            ? geographicService.constants.ROOM_REFERENCE_CONTEXT
+            : bimobjectservice.constants.BIM_OBJECT_CONTEXT_TYPE,
+
+        relation:
+          nodeType === groupService.constants.ROOMS_GROUP
+            ? geographicService.constants.ROOM_RELATION
+            : bimobjectservice.constants.BIM_OBJECT_RELATION_NAME
+      };
+
+      return {
+        contextId: contextId,
+        nodeId: nodeId,
+        type: nodeType,
+        reference: obj
+      };
+    },
     isCategory() {
       let type;
 
@@ -334,10 +380,9 @@ export default {
       }
 
       return (
-        type === ROOMS_GROUP_CONTEXT ||
-        type === EQUIPMENTS_GROUP_CONTEXT ||
+        groupService.constants.CONTEXTS_TYPES.indexOf(type) !== -1 ||
         (typeof this.edit !== "undefined" &&
-          (type === ROOMS_CATEGORY || type === EQUIPMENTS_CATEGORY))
+          type === groupService.constants.CATEGORY_TYPE)
       );
     },
 
@@ -358,13 +403,12 @@ export default {
       if (typeof this.edit === "undefined") {
         return (
           this.parent &&
-          (this.parent.type.get() === ROOMS_CATEGORY ||
-            this.parent.type.get() === EQUIPMENTS_CATEGORY)
+          this.parent.type.get() === groupService.constants.CATEGORY_TYPE
         );
       } else {
         let type = this.parent.type.get();
 
-        return type === ROOMS_GROUP || type === EQUIPMENTS_GROUP;
+        return groupService.constants.GROUPS_TYPES.indexOf(type) !== -1;
       }
     },
 

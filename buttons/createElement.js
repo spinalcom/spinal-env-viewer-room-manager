@@ -7,14 +7,15 @@ import {
 } from "spinal-env-viewer-panel-manager-service";
 
 import {
-  ROOMS_GROUP_CONTEXT,
-  EQUIPMENTS_GROUP_CONTEXT,
-  ROOMS_GROUP,
-  EQUIPMENTS_GROUP,
-  ROOMS_CATEGORY,
-  EQUIPMENTS_CATEGORY,
-  typeLst
-} from "../js/service";
+  groupService
+
+} from "../services/service";
+
+let typeLst = [
+  ...groupService.constants.CONTEXTS_TYPES,
+  ...groupService.constants.GROUPS_TYPES,
+  groupService.constants.CATEGORY_TYPE
+]
 
 class CreateElement extends SpinalContextApp {
   constructor() {
@@ -45,13 +46,11 @@ class CreateElement extends SpinalContextApp {
     };
 
 
-    if (nodeType === ROOMS_GROUP_CONTEXT || nodeType ===
-      EQUIPMENTS_GROUP_CONTEXT) {
+    if (groupService.constants.CONTEXTS_TYPES.indexOf(nodeType) !== -1) {
       parameters.title = "add Category";
-    } else if (nodeType === ROOMS_CATEGORY || nodeType ===
-      EQUIPMENTS_CATEGORY) {
+    } else if (nodeType === groupService.constants.CATEGORY_TYPE) {
       parameters.title = "add Group";
-    } else if (nodeType === ROOMS_GROUP || nodeType === EQUIPMENTS_GROUP) {
+    } else if (groupService.constants.GROUPS_TYPES.indexOf(nodeType) !== -1) {
       parameters["hide"] = true; //don't show the dialog modal
     }
 

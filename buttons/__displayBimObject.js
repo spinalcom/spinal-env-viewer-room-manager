@@ -3,13 +3,8 @@ import {
 } from "spinal-env-viewer-context-menu-service";
 
 import {
-  ROOMS_GROUP_CONTEXT,
-  ROOMS_GROUP,
-  EQUIPMENTS_GROUP,
-  EQUIPMENTS_GROUP_CONTEXT,
-  ROOMS_GROUP_RELATION,
-  EQUIPMENTS_GROUP_RELATION
-} from "../js/service";
+  groupService
+} from "../services/service";
 
 import {
   utilities,
@@ -29,21 +24,20 @@ class DisplayBimObjects extends SpinalContextApp {
     });
   }
 
-  display(contextType, selectedNodeType) {
-    if (contextType === selectedNodeType) {
-      return (
-        contextType === ROOMS_GROUP_CONTEXT ||
-        contextType === EQUIPMENTS_GROUP_CONTEXT
-      );
-    } else {
-      return (
-        (contextType === ROOMS_GROUP_CONTEXT ||
-          contextType === EQUIPMENTS_GROUP_CONTEXT) &&
-        (selectedNodeType === ROOMS_GROUP ||
-          selectedNodeType === EQUIPMENTS_GROUP)
-      );
-    }
-  }
+  // display(contextType, selectedNodeType) {
+  //   if (contextType === selectedNodeType) {
+  //     return groupService.constants.CONTEXTS_TYPES.indexOf(contextType) !== -
+  //     1;
+
+  //   } else {
+  //     return (
+  //       (contextType === ROOMS_GROUP_CONTEXT ||
+  //         contextType === EQUIPMENTS_GROUP_CONTEXT) &&
+  //       (selectedNodeType === ROOMS_GROUP ||
+  //         selectedNodeType === EQUIPMENTS_GROUP)
+  //     );
+  //   }
+  // }
 
   isShown(option) {
     let contextType = option.context.type.get();
@@ -52,8 +46,8 @@ class DisplayBimObjects extends SpinalContextApp {
     let selectedNodeId = option.selectedNode.id.get();
 
     if (
-      this.display(contextType, selectedNodeType) &&
-      selectedNodeId !== contextId
+      groupService.constants.CONTEXTS_TYPES.indexOf(contextType) !== -
+      1 && selectedNodeId !== contextId
     ) {
       if (typeof ItemsColoredMap.get(selectedNodeId) !== "undefined") {
         this.buttonCfg.icon = "visibility_off";
@@ -65,11 +59,13 @@ class DisplayBimObjects extends SpinalContextApp {
       this.display(contextType, selectedNodeType) &&
       selectedNodeId === contextId
     ) {
-      let relationName =
-        contextType === ROOMS_GROUP_CONTEXT ?
-        ROOMS_GROUP_RELATION :
-        EQUIPMENTS_GROUP_RELATION;
-      return SpinalGraphService.getChildren(contextId, [relationName]).then(
+      // let relationName =
+      //   contextType === ROOMS_GROUP_CONTEXT ?
+      //   ROOMS_GROUP_RELATION :
+      //   EQUIPMENTS_GROUP_RELATION;
+      return SpinalGraphService.getChildren(contextId, [groupService.constants
+        .CATEGORY_TO_GROUP_RELATION
+      ]).then(
         children => {
           for (let index = 0; index < children.length; index++) {
             const element = children[index];

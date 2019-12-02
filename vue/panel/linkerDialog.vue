@@ -115,13 +115,7 @@
 // import filterMenu from "../filterMenu/menu.vue";
 
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-import {
-  groupService,
-  ROOMS_GROUP,
-  ROOMS_CATEGORY,
-  ROOMS_GROUP_RELATION,
-  EQUIPMENTS_GROUP_RELATION
-} from "../../js/service";
+import { groupService } from "../../services/service";
 const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
@@ -161,7 +155,10 @@ export default {
       this.groupId = option.nodeId;
 
       this.title =
-        "Link " + (option.type === ROOMS_GROUP ? "Rooms" : "BimObject");
+        "Link " +
+        (option.type === groupService.constants.ROOMS_GROUP
+          ? "Rooms"
+          : "BimObject");
       this.setTitle(this.title);
       let refContext = SpinalGraphService.getContext(option.reference.context);
 
@@ -268,11 +265,9 @@ export default {
           let parent = res ? res[0] : undefined;
 
           if (parent) {
-            let type = parent.type.get();
+            // let type = parent.type.get();
             let relationName =
-              type === ROOMS_CATEGORY
-                ? ROOMS_GROUP_RELATION
-                : EQUIPMENTS_GROUP_RELATION;
+              groupService.constants.CATEGORY_TO_GROUP_RELATION;
 
             return SpinalGraphService.getChildren(parent.id.get(), [
               relationName

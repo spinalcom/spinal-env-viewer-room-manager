@@ -10,7 +10,7 @@ import {
   ROOMS_GROUP_CONTEXT,
   ROOMS_GROUP_RELATION,
   EQUIPMENTS_GROUP_RELATION
-} from "./service";
+} from "../services/service";
 
 let ItemsColoredMap = new Map();
 let BimElementsColor = new Map();

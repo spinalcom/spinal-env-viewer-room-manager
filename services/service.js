@@ -7,51 +7,11 @@ import {
   Model
 } from "spinal-core-connectorjs_type";
 
-
-
-const ROOMS_GROUP_CONTEXT = "RoomsGroupContext";
-const ROOMS_GROUP = "RoomsGroup";
-const ROOMS_GROUP_RELATION = "hasRoomsGroup";
-const ROOMS_TO_ELEMENT_RELATION = "groupHasRooms";
-const ROOMS_CATEGORY = "Rooms_category";
-const ROOMS_CATEGORY_RELATION = "hasRoomsCategory";
-
-
-const EQUIPMENTS_GROUP_CONTEXT = "EquipmentGroupContext";
-const EQUIPMENTS_GROUP = "EquipmentGroup";
-const EQUIPMENTS_GROUP_RELATION = "hasEquipmentsGroup";
-const EQUIPMENTS_TO_ELEMENT_RELATION = "groupHasEquipments";
-const EQUIPMENTS_CATEGORY = "Equipment_category";
-const EQUIPMENTS_CATEGORY_RELATION = "hasEquipmentsCategory";
-
-
-const typeLst = [
-  ROOMS_GROUP_CONTEXT,
-  ROOMS_GROUP,
-  ROOMS_CATEGORY,
-  EQUIPMENTS_GROUP_CONTEXT,
-  EQUIPMENTS_GROUP,
-  EQUIPMENTS_CATEGORY
-]
-
-
-
-const TYPE_AND_RELATION = new Map();
-TYPE_AND_RELATION.set(ROOMS_GROUP_CONTEXT, ROOMS_CATEGORY_RELATION)
-TYPE_AND_RELATION.set(ROOMS_GROUP, ROOMS_TO_ELEMENT_RELATION)
-TYPE_AND_RELATION.set(ROOMS_CATEGORY, ROOMS_GROUP_RELATION)
-TYPE_AND_RELATION.set(EQUIPMENTS_GROUP_CONTEXT, EQUIPMENTS_CATEGORY_RELATION)
-TYPE_AND_RELATION.set(EQUIPMENTS_GROUP, EQUIPMENTS_TO_ELEMENT_RELATION)
-TYPE_AND_RELATION.set(EQUIPMENTS_CATEGORY, EQUIPMENTS_GROUP_RELATION)
-
-
-
-
-
-
+import constants from "./constants";
 
 
 let groupService = {
+  constants: constants,
   createGroupContext(name, type) {
     const context = SpinalGraphService.getContext(name);
 
@@ -67,8 +27,11 @@ let groupService = {
   },
   addElement(contextId, elementId, elementType, elementName, iconName,
     color) {
+    let contextInfo = SpinalGraphService.getInfo(contextId)
+    let contextType = contextInfo && contextInfo.type ? contextInfo.type
+      .get() : undefined;
 
-    let typeAndRelation = this.getTypeAndRelation(elementType);
+    let typeAndRelation = this.getTypeAndRelation(elementType, contextType);
 
 
     let type = typeAndRelation.type;
@@ -119,8 +82,7 @@ let groupService = {
     let realNode = SpinalGraphService.getRealNode(groupId);
     const type = realNode.getType().get();
 
-    let relationName = type === ROOMS_GROUP ? ROOMS_TO_ELEMENT_RELATION :
-      EQUIPMENTS_TO_ELEMENT_RELATION;
+    let relationName = constants.GROUP_RELATION_ASSOCIATION.get(type)
 
     try {
       let ids = realNode.children[SPINAL_RELATION_PTR_LST_TYPE][relationName]
@@ -150,11 +112,9 @@ let groupService = {
 
     let groupInfo = SpinalGraphService.getInfo(groupId);
 
-    let relationName = groupInfo.type.get() === ROOMS_GROUP ?
-      ROOMS_TO_ELEMENT_RELATION :
-      EQUIPMENTS_TO_ELEMENT_RELATION;
+    let relationName = constants.GROUP_RELATION_ASSOCIATION.get(groupInfo.type
+      .get());
 
-    //
 
     return this.getCategorie(groupInfo).then(category => {
 
@@ -184,81 +144,83 @@ let groupService = {
   },
   removeLink(groupId, elementId) {
     let type = SpinalGraphService.getInfo(groupId).type.get();
-    let relationName = type === ROOMS_GROUP ? ROOMS_TO_ELEMENT_RELATION :
-      EQUIPMENTS_TO_ELEMENT_RELATION;
+    let relationName = constants.GROUP_RELATION_ASSOCIATION.get(type);
 
     return SpinalGraphService.removeChild(groupId, elementId,
       relationName,
       SPINAL_RELATION_PTR_LST_TYPE)
   },
-  getTypeAndRelation(elementType) {
+  getTypeAndRelation(elementType, contextType) {
 
     switch (elementType) {
-      case ROOMS_GROUP_CONTEXT:
+      case contextType:
         return {
-          type: ROOMS_CATEGORY,
-            relation: ROOMS_CATEGORY_RELATION
+          type: constants.CATEGORY_TYPE,
+            relation: constants.CONTEXT_TO_CATEGORY_RELATION
         };
+
         // case ROOMS_GROUP:
         //   return {
         //     type: "undefined",
         //       relation:
         //   };
-      case ROOMS_CATEGORY:
+      case constants.CATEGORY_TYPE:
+        // eslint-disable-next-line no-case-declarations
+        let type = constants.CONTEXT_GROUP_ASSOCIATION.get(contextType);
         return {
-          type: ROOMS_GROUP,
-            relation: ROOMS_GROUP_RELATION
+          type: type,
+            relation: constants.CATEGORY_TO_GROUP_RELATION
         };
-      case EQUIPMENTS_GROUP_CONTEXT:
-        return {
-          type: EQUIPMENTS_CATEGORY,
-            relation: EQUIPMENTS_CATEGORY_RELATION
-        };
-        // case EQUIPMENTS_GROUP:
+
+        // case constants.ROOMS_GROUP:
+        // case constants.EQUIPMENTS_GROUP:
+        // case constants.ENDPOINT_GROUP:
         //   return {
-        //     type: undefined,
-        //       relation: undefined
-        //   };
-      case EQUIPMENTS_CATEGORY:
-        return {
-          type: EQUIPMENTS_GROUP,
-            relation: EQUIPMENTS_GROUP_RELATION
-        };
+        //     type: "",
+        //       relation: constants.GROUP_RELATION_ASSOCIATION.get(elementType)
+        //   }
+
       default:
         return {};
     }
   },
+
   getElementsLinked(groupId) {
     let type = SpinalGraphService.getInfo(groupId).type.get();
-    let relationName = type === ROOMS_GROUP ? ROOMS_TO_ELEMENT_RELATION :
-      EQUIPMENTS_TO_ELEMENT_RELATION;
+    let relationName = constants.GROUP_RELATION_ASSOCIATION.get(type);
 
     return SpinalGraphService.getChildren(groupId, [relationName]);
   },
 
   getGroups(selectedNode) {
 
-    const ROOMS_TYPES = [
-      ROOMS_GROUP_CONTEXT,
-      ROOMS_CATEGORY,
-      ROOMS_GROUP
-    ]
+    // const ROOMS_TYPES = [
+    //   ROOMS_GROUP_CONTEXT,
+    //   ROOMS_CATEGORY,
+    //   ROOMS_GROUP
+    // ]
 
 
     let type = selectedNode.type.get();
     let nodeId = selectedNode.id.get();
 
-    if (type === ROOMS_GROUP || type === EQUIPMENTS_GROUP) {
+    if (typeof constants.GROUP_RELATION_ASSOCIATION.get(type) !==
+      "undefined") {
       return Promise.resolve([selectedNode]);
     }
 
-    let relations = ROOMS_TYPES.indexOf(type) !== -1 ? [
-      ROOMS_CATEGORY_RELATION, ROOMS_GROUP_RELATION
-    ] : [EQUIPMENTS_CATEGORY_RELATION, EQUIPMENTS_GROUP_RELATION];
+    let relations = [
+      constants.CONTEXT_TO_CATEGORY_RELATION,
+      constants.CATEGORY_TO_GROUP_RELATION,
+      constants.GROUP_TO_ROOMS_RELATION,
+      constants.GROUP_TO_EQUIPMENTS_RELATION,
+      constants.GROUP_TO_ENDPOINT_RELATION
+    ];
 
     return SpinalGraphService.findNodes(nodeId, relations, (node) => {
       let argType = node.getType().get()
-      return argType === ROOMS_GROUP || argType === EQUIPMENTS_GROUP
+      return typeof constants.GROUP_RELATION_ASSOCIATION.get(argType) !==
+        "undefined"
     }).then(res => {
       return res.map(el => {
         SpinalGraphService._addNode(el);
@@ -271,30 +233,22 @@ let groupService = {
     let type = selectedNode.type.get();
     let nodeId = selectedNode.id.get();
 
-    if (type === ROOMS_CATEGORY || type === EQUIPMENTS_CATEGORY) {
-
+    if (type === constants.CATEGORY_TYPE) {
       return Promise.resolve(selectedNode);
-
-    } else if (type === ROOMS_GROUP_CONTEXT || type ===
-      EQUIPMENTS_GROUP_CONTEXT) {
-      let relationName = type === ROOMS_GROUP_CONTEXT ?
-        ROOMS_CATEGORY_RELATION : EQUIPMENTS_CATEGORY_RELATION;
-
-      return SpinalGraphService.getChildren(nodeId, [relationName]);
+    } else if (constants.CONTEXTS_TYPES.indexOf(type) !== -1) {
+      return SpinalGraphService.getChildren(nodeId, [constants
+        .CONTEXT_TO_CATEGORY_RELATION
+      ]);
 
     } else {
       let relationRefPromises = [];
 
 
       let node = SpinalGraphService.getRealNode(nodeId);
-      let relationName = type === ROOMS_GROUP ? ROOMS_GROUP_RELATION :
-        EQUIPMENTS_GROUP_RELATION;
 
-
-      let relationList = node.parents[relationName];
+      let relationList = node.parents[constants.CATEGORY_TO_GROUP_RELATION];
 
       if (relationList) {
-
         for (let i = 0; i < relationList.length; i++) {
           const element = relationList[i];
           relationRefPromises.push(element.load());
@@ -335,15 +289,17 @@ let groupService = {
 
   elementIsInCategorie(categoryId, elementId) {
 
-    let nodeInfo = SpinalGraphService.getInfo(categoryId);
-    let type = nodeInfo.type.get();
+    // let nodeInfo = SpinalGraphService.getInfo(categoryId);
+    // let type = nodeInfo.type.get();
 
-    let relationName =
-      type === ROOMS_CATEGORY ?
-      ROOMS_GROUP_RELATION :
-      EQUIPMENTS_GROUP_RELATION;
+    // let relationName =
+    //   type === ROOMS_CATEGORY ?
+    //   ROOMS_GROUP_RELATION :
+    //   EQUIPMENTS_GROUP_RELATION;
 
-    return SpinalGraphService.getChildren(categoryId, [relationName])
+    return SpinalGraphService.getChildren(categoryId, [constants
+        .CATEGORY_TO_GROUP_RELATION
+      ])
       .then(
         children => {
 
@@ -360,19 +316,20 @@ let groupService = {
 };
 
 export {
-  ROOMS_GROUP_CONTEXT,
-  ROOMS_GROUP,
-  EQUIPMENTS_GROUP,
-  ROOMS_GROUP_RELATION,
-  EQUIPMENTS_GROUP_RELATION,
-  EQUIPMENTS_GROUP_CONTEXT,
-  ROOMS_TO_ELEMENT_RELATION,
-  EQUIPMENTS_TO_ELEMENT_RELATION,
-  ROOMS_CATEGORY,
-  ROOMS_CATEGORY_RELATION,
-  EQUIPMENTS_CATEGORY,
-  EQUIPMENTS_CATEGORY_RELATION,
-  typeLst,
-  TYPE_AND_RELATION,
+  // ROOMS_GROUP_CONTEXT,
+  // ROOMS_GROUP,
+  // EQUIPMENTS_GROUP,
+  // ROOMS_GROUP_RELATION,
+  // EQUIPMENTS_GROUP_RELATION,
+  // EQUIPMENTS_GROUP_CONTEXT,
+  // ROOMS_TO_ELEMENT_RELATION,
+  // EQUIPMENTS_TO_ELEMENT_RELATION,
+  // ROOMS_CATEGORY,
+  // ROOMS_CATEGORY_RELATION,
+  // EQUIPMENTS_CATEGORY,
+  // EQUIPMENTS_CATEGORY_RELATION,
+  // typeLst,
+  // TYPE_AND_RELATION,
+
   groupService
 };

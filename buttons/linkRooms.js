@@ -6,13 +6,8 @@ import {
 } from "spinal-env-viewer-panel-manager-service";
 
 import {
-  ROOMS_GROUP_CONTEXT,
-  EQUIPMENTS_GROUP_CONTEXT,
-  ROOMS_GROUP,
-  EQUIPMENTS_GROUP,
-  ROOMS_CATEGORY,
-  EQUIPMENTS_CATEGORY
-} from "../js/service";
+  groupService
+} from "../services/service";
 
 
 
@@ -43,16 +38,16 @@ class LinkRooms extends SpinalContextApp {
 
     let nodeType = option.selectedNode.type.get();
 
-    let tempList = [
-      // ROOMS_GROUP_CONTEXT, /* Commenter pour desactiver le panel global */
-      // EQUIPMENTS_GROUP_CONTEXT, /* Commenter pour desactiver le panel global */
-      // ROOMS_CATEGORY, /* Commenter pour desactiver le panel global */
-      // EQUIPMENTS_CATEGORY, /* Commenter pour desactiver le panel global */
-      ROOMS_GROUP
-      // EQUIPMENTS_GROUP
-    ]
-
-    return Promise.resolve(tempList.indexOf(nodeType));
+    // let tempList = [
+    //   // ROOMS_GROUP_CONTEXT, /* Commenter pour desactiver le panel global */
+    //   // EQUIPMENTS_GROUP_CONTEXT, /* Commenter pour desactiver le panel global */
+    //   // ROOMS_CATEGORY, /* Commenter pour desactiver le panel global */
+    //   // EQUIPMENTS_CATEGORY, /* Commenter pour desactiver le panel global */
+    //   ROOMS_GROUP
+    //   // EQUIPMENTS_GROUP
+    // ]
+    let value = nodeType === groupService.constants.ROOMS_GROUP ? true : -1;
+    return Promise.resolve(value);
   }
 
   action(option) {
@@ -60,10 +55,9 @@ class LinkRooms extends SpinalContextApp {
     let contextId = option.context.id.get();
     let nodeId = option.selectedNode.id.get();
 
-    let tempList = [ROOMS_GROUP_CONTEXT,
-      EQUIPMENTS_GROUP_CONTEXT,
-      ROOMS_CATEGORY,
-      EQUIPMENTS_CATEGORY
+    let tempList = [
+      ...groupService.constants.GROUPS_TYPES,
+      groupService.constants.CATEGORY_TYPE
     ]
 
     if (tempList.indexOf(nodeType) === -1) {
@@ -103,11 +97,12 @@ class LinkRooms extends SpinalContextApp {
 
 let getParameter = (contextId, nodeId, nodeType) => {
   let obj = {
-    context: nodeType === ROOMS_GROUP ? geographicService.constants
+    context: nodeType === groupService.constants.ROOMS_GROUP ?
+      geographicService.constants
       .ROOM_REFERENCE_CONTEXT : bimobjectservice.constants
       .BIM_OBJECT_CONTEXT_TYPE,
 
-    relation: nodeType === ROOMS_GROUP ?
+    relation: nodeType === groupService.constants.ROOMS_GROUP ?
       geographicService.constants.ROOM_RELATION : bimobjectservice.constants
       .BIM_OBJECT_RELATION_NAME
   }

@@ -1,17 +1,18 @@
 import {
-  ROOMS_CATEGORY_RELATION,
-  ROOMS_GROUP_RELATION,
-  ROOMS_TO_ELEMENT_RELATION,
-  EQUIPMENTS_CATEGORY_RELATION,
-  EQUIPMENTS_GROUP_RELATION,
-  EQUIPMENTS_TO_ELEMENT_RELATION,
-  ROOMS_GROUP_CONTEXT,
-  ROOMS_GROUP,
-  ROOMS_CATEGORY,
-  EQUIPMENTS_GROUP_CONTEXT,
-  EQUIPMENTS_CATEGORY,
-  EQUIPMENTS_GROUP
-} from "./service";
+  // ROOMS_CATEGORY_RELATION,
+  // ROOMS_GROUP_RELATION,
+  // ROOMS_TO_ELEMENT_RELATION,
+  // EQUIPMENTS_CATEGORY_RELATION,
+  // EQUIPMENTS_GROUP_RELATION,
+  // EQUIPMENTS_TO_ELEMENT_RELATION,
+  // ROOMS_GROUP_CONTEXT,
+  // ROOMS_GROUP,
+  // ROOMS_CATEGORY,
+  // EQUIPMENTS_GROUP_CONTEXT,
+  // EQUIPMENTS_CATEGORY,
+  // EQUIPMENTS_GROUP
+  groupService
+} from "../services/service";
 import {
   SpinalGraphService
 } from "spinal-env-viewer-graph-service";
@@ -28,32 +29,32 @@ let BimElementsColor = new Map();
 
 
 const ROOMS_RELATIONS = [
-  ROOMS_CATEGORY_RELATION,
-  ROOMS_GROUP_RELATION,
-  ROOMS_TO_ELEMENT_RELATION,
+  groupService.constants.CATEGORY_TO_GROUP_RELATION,
+  groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
+  groupService.constants.GROUP_TO_ROOMS_RELATION,
   geographicService.constants.REFERENCE_RELATION,
   geographicService.constants.EQUIPMENT_RELATION
 ]
 
 
 const EQUIPMENTS_RELATIONS = [
-  EQUIPMENTS_CATEGORY_RELATION,
-  EQUIPMENTS_GROUP_RELATION,
-  EQUIPMENTS_TO_ELEMENT_RELATION
+  groupService.constants.CATEGORY_TO_GROUP_RELATION,
+  groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
+  groupService.constants.GROUP_TO_EQUIPMENTS_RELATION
 ]
 
 
 const ROOMS_TYPES = [
-  ROOMS_GROUP_CONTEXT,
-  ROOMS_CATEGORY,
-  ROOMS_GROUP
+  groupService.constants.ROOMS_GROUP_CONTEXT,
+  groupService.constants.CATEGORY_TYPE,
+  groupService.constants.ROOMS_GROUP
 ]
 
 // eslint-disable-next-line no-unused-vars
 const EQUIPMENTS_TYPES = [
-  EQUIPMENTS_GROUP_CONTEXT,
-  EQUIPMENTS_CATEGORY,
-  EQUIPMENTS_GROUP
+  groupService.constants.EQUIPMENTS_GROUP_CONTEXT,
+  groupService.constants.CATEGORY_TYPE,
+  groupService.constants.EQUIPMENTS_GROUP
 ]
 
 
@@ -83,7 +84,14 @@ let utilities = {
         .EQUIPMENT_RELATION
       ]);
     } else {
-      let relations = [];
+      let relations = [
+        groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
+        groupService.constants.GROUP_TO_ROOMS_RELATION,
+        geographicService.constants.REFERENCE_RELATION,
+        geographicService.constants.EQUIPMENT_RELATION,
+        groupService.constants.CATEGORY_TO_GROUP_RELATION,
+        groupService.constants.GROUP_TO_EQUIPMENTS_RELATION
+      ];
 
       if (ROOMS_TYPES.indexOf(type) !== -1) {
         relations = ROOMS_RELATIONS;
@@ -109,17 +117,15 @@ let utilities = {
     let type = selectedNode.type.get();
     let nodeId = selectedNode.id.get();
 
-    if (type === ROOMS_GROUP || type === EQUIPMENTS_GROUP) {
+    if (groupService.constants.GROUPS_TYPES.indexOf(type) !== -1) {
       return Promise.resolve([selectedNode]);
     }
 
-    let relations = ROOMS_TYPES.indexOf(type) !== -1 ? [
-      ROOMS_CATEGORY_RELATION, ROOMS_GROUP_RELATION
-    ] : [EQUIPMENTS_CATEGORY_RELATION, EQUIPMENTS_GROUP_RELATION];
+    let relations = []
 
     return SpinalGraphService.findNodes(nodeId, relations, (node) => {
       let argType = node.getType().get()
-      return argType === ROOMS_GROUP || argType === EQUIPMENTS_GROUP
+      return groupService.constants.GROUPS_TYPES.indexOf(argType) !== -1;
     }).then(res => {
       return res.map(el => {
         SpinalGraphService._addNode(el);

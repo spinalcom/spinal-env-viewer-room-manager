@@ -4,9 +4,8 @@ import {
 
 import utilities from "../js/utilities";
 import {
-  ROOMS_GROUP_CONTEXT,
-  EQUIPMENTS_GROUP_CONTEXT
-} from "../js/service";
+  groupService
+} from "../services/service";
 
 import geographicService from "spinal-env-viewer-context-geographic-service";
 
@@ -23,9 +22,8 @@ class ViewChildren extends SpinalContextApp {
     let contextType = option.context.type.get();
     let nodeType = option.selectedNode.type.get();
 
-    if ((contextType === ROOMS_GROUP_CONTEXT || contextType ===
-        EQUIPMENTS_GROUP_CONTEXT) && (nodeType !== geographicService.constants
-        .EQUIPMENT_TYPE)) {
+    if (groupService.constants.CONTEXTS_TYPES.indexOf(contextType) !== -1 &&
+      nodeType !== geographicService.constants.EQUIPMENT_TYPE) {
       return utilities.getIcon(option.selectedNode, option.context).then(
         (isColored) => {
           this.buttonCfg["isColored"] = isColored;

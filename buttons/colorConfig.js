@@ -3,13 +3,8 @@ import {
 } from "spinal-env-viewer-context-menu-service";
 
 import {
-  ROOMS_GROUP_CONTEXT,
-  EQUIPMENTS_GROUP_CONTEXT,
-  EQUIPMENTS_GROUP,
-  ROOMS_GROUP,
-  EQUIPMENTS_CATEGORY,
-  ROOMS_CATEGORY
-} from "../js/service";
+  groupService
+} from "../services/service";
 
 import {
   spinalPanelManagerService
@@ -25,27 +20,30 @@ class ColorConfig extends SpinalContextApp {
     });
   }
 
-  display(contextType, selectedNodeType) {
+  // display(contextType, selectedNodeType) {
 
-    let tempList = [
-      EQUIPMENTS_GROUP,
-      ROOMS_GROUP,
-      EQUIPMENTS_CATEGORY,
-      ROOMS_CATEGORY
-    ];
+  //   let tempList = [
+  //     EQUIPMENTS_GROUP,
+  //     ROOMS_GROUP,
+  //     EQUIPMENTS_CATEGORY,
+  //     ROOMS_CATEGORY
+  //   ];
 
-    return (
-      (contextType === ROOMS_GROUP_CONTEXT ||
-        contextType === EQUIPMENTS_GROUP_CONTEXT) && (tempList.indexOf(
-        selectedNodeType) !== -1)
-    );
-  }
+  //   return (
+  //     groupService.constants.CONTEXTS_TYPES.indexOf(contextType) !== -1 && (
+  //       tempList.indexOf(
+  //         selectedNodeType) !== -1)
+  //   );
+  // }
 
   isShown(option) {
     let contextType = option.context.type.get();
     let selectedNodeType = option.selectedNode.type.get();
 
-    if (this.display(contextType, selectedNodeType)) {
+    if (
+      groupService.constants.CONTEXTS_TYPES.indexOf(contextType) !== -1 &&
+      (groupService.constants.GROUPS_TYPES.indexOf(selectedNodeType) !== -1 ||
+        selectedNodeType === groupService.constants.CATEGORY_TYPE)) {
       return Promise.resolve(true);
     }
     return Promise.resolve(-1);
@@ -64,10 +62,10 @@ class ColorConfig extends SpinalContextApp {
       selectedNode: option.selectedNode
     };
 
-    if (type === ROOMS_GROUP || type === EQUIPMENTS_GROUP) {
+    if (groupService.constants.GROUPS_TYPES.indexOf(type) !== -1) {
       params["color"] = option.selectedNode.color ? option.selectedNode
         .color.get() : "#000000";
-    } else if (type === ROOMS_CATEGORY || type === EQUIPMENTS_CATEGORY) {
+    } else if (type === groupService.constants.CATEGORY_TYPE) {
       params["iconSelected"] = option.selectedNode.icon ? option.selectedNode
         .icon.get() : undefined;
     }
