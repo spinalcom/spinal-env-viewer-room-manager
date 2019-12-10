@@ -335,22 +335,22 @@ export default {
       let contextId = this.contextId;
       let nodeId = this.parent.id.get();
 
-      let tempList = [
-        ...groupService.constants.GROUPS_TYPES,
-        groupService.constants.CATEGORY_TYPE
-      ];
+      // let tempList = [
+      //   ...groupService.constants.GROUPS_TYPES,
+      //   groupService.constants.CATEGORY_TYPE
+      // ];
 
-      if (tempList.indexOf(nodeType) === -1) {
+      // if (tempList.indexOf(nodeType) === -1) {
         spinalPanelManagerService.openPanel(
           "linkRoomPanel",
           this.getParameter(contextId, nodeId, nodeType)
         );
-      } else {
-        spinalPanelManagerService.openPanel("globalLinkRoomPanel", {
-          nodeId: nodeId,
-          contextId: contextId
-        });
-      }
+      // } else {
+      //   spinalPanelManagerService.openPanel("globalLinkRoomPanel", {
+      //     nodeId: nodeId,
+      //     contextId: contextId
+      //   });
+      // }
     },
     getParameter(contextId, nodeId, nodeType) {
       let obj = {

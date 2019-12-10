@@ -55,26 +55,26 @@ class LinkRooms extends SpinalContextApp {
     let contextId = option.context.id.get();
     let nodeId = option.selectedNode.id.get();
 
-    let tempList = [
-      ...groupService.constants.GROUPS_TYPES,
-      groupService.constants.CATEGORY_TYPE
-    ]
+    // let tempList = [
+    //   ...groupService.constants.GROUPS_TYPES,
+    //   groupService.constants.CATEGORY_TYPE
+    // ]
 
-    if (tempList.indexOf(nodeType) === -1) {
-      spinalPanelManagerService.openPanel(
-        "linkRoomPanel",
-        getParameter(
-          contextId,
-          nodeId,
-          nodeType
-        )
-      );
-    } else {
-      spinalPanelManagerService.openPanel("globalLinkRoomPanel", {
-        nodeId: nodeId,
-        contextId: contextId
-      })
-    }
+    // if (tempList.indexOf(nodeType) === -1) {
+    spinalPanelManagerService.openPanel(
+      "linkRoomPanel",
+      getParameter(
+        contextId,
+        nodeId,
+        nodeType
+      )
+    );
+    // } else {
+    //   spinalPanelManagerService.openPanel("globalLinkRoomPanel", {
+    //     nodeId: nodeId,
+    //     contextId: contextId
+    //   })
+    // }
 
     // let selectedContextRelation =
     //   nodeType === ROOMS_GROUP_CONTEXT ?

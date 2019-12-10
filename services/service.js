@@ -258,8 +258,6 @@ let groupService = {
 
       return Promise.all(relationRefPromises).then(refs => {
 
-        // let promises = [];
-
         let promises = refs.map(node => {
           return node.parent.load();
         })
