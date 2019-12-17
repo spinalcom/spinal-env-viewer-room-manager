@@ -13,6 +13,7 @@ import {
   spinalContextMenuService
 } from "spinal-env-viewer-context-menu-service";
 
+
 const SIDEBAR = "GraphManagerSideBar";
 const HEADERBAR = "GraphManagerTopBar";
 
@@ -24,6 +25,7 @@ spinalContextMenuService.registerApp(SIDEBAR, new ViewChildren(), [31]);
 spinalContextMenuService.registerApp(SIDEBAR, new ColorConfig(), [3]);
 spinalContextMenuService.registerApp(SIDEBAR, new LinkRooms(), [3]);
 // spinalContextMenuService.registerApp(SIDEBAR, new AddToReference());
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
