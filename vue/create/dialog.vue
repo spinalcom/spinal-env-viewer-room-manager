@@ -1,3 +1,27 @@
+<!--
+Copyright 2020 SpinalCom - www.spinalcom.com
+
+This file is part of SpinalCore.
+
+Please read all of the following terms and conditions
+of the Free Software license Agreement ("Agreement")
+carefully.
+
+This Agreement is a legally binding contract between
+the Licensee (as defined below) and SpinalCom that
+sets forth the terms and conditions that govern your
+use of the Program. By installing and/or using the
+Program, you agree to abide by all the terms and
+conditions stated or referenced herein.
+
+If you do not agree to abide by these terms and
+conditions, do not demonstrate your acceptance and do
+not install or use the Program.
+You should have received a copy of the license along
+with this file. If not, see
+<http://resources.spinalcom.com/licenses.pdf>.
+-->
+
 <template>
   <md-dialog :md-active.sync="showDialog"
              @md-closed="closeDialog(false)">
@@ -81,6 +105,7 @@ export default {
   },
   data() {
     this.hide;
+
     this.GroupTypes = [
       {
         name: "Rooms Group",
@@ -95,6 +120,7 @@ export default {
         type: groupService.constants.ENDPOINTS_GROUP_CONTEXT
       }
     ];
+
     this.edit;
 
     return {
@@ -106,9 +132,11 @@ export default {
       color: null,
       typeSelected: groupService.constants.ROOMS_GROUP_CONTEXT,
       parent: undefined,
-      contextId: null
+      contextId: null,
+      callback: () => {}
     };
   },
+
   methods: {
     opened(option) {
       this.hide = option.hide; // hide dialog Modal
@@ -132,6 +160,8 @@ export default {
         this.iconSelected = option.iconSelected;
       }
 
+      if (option.callback) this.callback = option.callback;
+
       if (this.hide) this.onFinised(true);
     },
 
@@ -140,9 +170,11 @@ export default {
         let value = this.inputValue.trim();
 
         if (typeof this.parent === "undefined") {
-          groupService.createGroupContext(value, this.typeSelected).then(() => {
-            this.sentEvent();
-          });
+          groupService
+            .createGroupContext(value, this.typeSelected)
+            .then(_res => {
+              this.sentEvent(_res.info.id.get());
+            });
         } else if (typeof this.hide === "undefined") {
           if (typeof this.edit === "undefined") {
             let type = this.parent.type.get();
@@ -156,8 +188,8 @@ export default {
                 this.iconSelected,
                 this.color ? this.color.hex : undefined
               )
-              .then(() => {
-                this.sentEvent();
+              .then(_res => {
+                this.sentEvent(_res.info.id.get());
               });
           } else {
             let realNode = SpinalGraphService.getRealNode(this.parent.id.get());
@@ -330,6 +362,7 @@ export default {
       //   });
       // });
     },
+
     addRooms() {
       let nodeType = this.parent.type.get();
       let contextId = this.contextId;
@@ -341,10 +374,10 @@ export default {
       // ];
 
       // if (tempList.indexOf(nodeType) === -1) {
-        spinalPanelManagerService.openPanel(
-          "linkRoomPanel",
-          this.getParameter(contextId, nodeId, nodeType)
-        );
+      spinalPanelManagerService.openPanel(
+        "linkRoomPanel",
+        this.getParameter(contextId, nodeId, nodeType)
+      );
       // } else {
       //   spinalPanelManagerService.openPanel("globalLinkRoomPanel", {
       //     nodeId: nodeId,
@@ -352,6 +385,7 @@ export default {
       //   });
       // }
     },
+
     getParameter(contextId, nodeId, nodeType) {
       let obj = {
         context:
@@ -372,6 +406,7 @@ export default {
         reference: obj
       };
     },
+
     isCategory() {
       let type;
 
@@ -395,6 +430,7 @@ export default {
       }
       return this.inputValue.trim().length === 0;
     },
+
     selectIcon(icon) {
       this.iconSelected = icon;
     },
@@ -412,8 +448,11 @@ export default {
       }
     },
 
-    sentEvent() {
-      EventBus.$emit("itemCreated");
+    sentEvent(id) {
+      if (this.callback && typeof this.callback === "function")
+        this.callback(id);
+
+      EventBus.$emit("itemCreated", id);
     }
   },
   filters: {
