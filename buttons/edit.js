@@ -2,15 +2,19 @@ import {
   SpinalContextApp
 } from "spinal-env-viewer-context-menu-service";
 
+// import {
+//   groupService
+// } from "../services/service";
+
 import {
-  groupService
-} from "../services/service";
+  groupManagerService
+} from "spinal-env-viewer-plugin-group-manager-service";
 
 import {
   spinalPanelManagerService
 } from "spinal-env-viewer-panel-manager-service";
 
-class ColorConfig extends SpinalContextApp {
+class Edit extends SpinalContextApp {
   constructor() {
     super("Edit", "This button allows  to edit group", {
       icon: "edit",
@@ -40,12 +44,14 @@ class ColorConfig extends SpinalContextApp {
     let contextType = option.context.type.get();
     let selectedNodeType = option.selectedNode.type.get();
 
-    if (
-      groupService.constants.CONTEXTS_TYPES.indexOf(contextType) !== -1 &&
-      (groupService.constants.GROUPS_TYPES.indexOf(selectedNodeType) !== -1 ||
-        selectedNodeType === groupService.constants.CATEGORY_TYPE)) {
+    const isContext = groupManagerService.isContext(contextType);
+    const isCategory = groupManagerService.isCategory(selectedNodeType);
+    const isGroup = groupManagerService.isGroup(selectedNodeType);
+
+    if (isContext && (isGroup || isCategory)) {
       return Promise.resolve(true);
     }
+
     return Promise.resolve(-1);
   }
 
@@ -57,27 +63,25 @@ class ColorConfig extends SpinalContextApp {
     let params = {
       edit: true,
       title: `Edit ${option.selectedNode.name.get()}`,
-      type: "element",
       contextId: option.context.id.get(),
       selectedNode: option.selectedNode
     };
 
-    if (groupService.constants.GROUPS_TYPES.indexOf(type) !== -1) {
+    if (groupManagerService.isGroup(type)) {
       params["color"] = option.selectedNode.color ? option.selectedNode
         .color.get() : "#000000";
-    } else if (type === groupService.constants.CATEGORY_TYPE) {
+      spinalPanelManagerService.openPanel("createGroupDialog", params);
+
+    } else if (groupManagerService.isCategory(type)) {
       params["iconSelected"] = option.selectedNode.icon ? option.selectedNode
         .icon.get() : undefined;
+
+      spinalPanelManagerService.openPanel("createCategoryDialog", params);
     }
 
-    spinalPanelManagerService.openPanel("createGroupContextDialog",
-      params);
-
     // spinalPanelManagerService.openPanel("colorConfigDialog", params);
-
-
 
   }
 }
 
-export default ColorConfig;
+export default Edit;

@@ -1,35 +1,44 @@
 import vue from "vue";
-import dialogComponent from "../vue/create/dialog.vue";
-import colorConfigDialog from '../vue/color/colorDialog.vue';
-import linkRoomDialog from '../vue/panel/linkerDialog.vue'
-import GlobalLinkerPanel from "../vue/others/globalLinkerPanel.vue";
 
+import createContextGroup from "../vue/dialogs/createContext.vue";
+import createCategoryDialog from "../vue/dialogs/createCategory.vue";
+import createGroupDialog from "../vue/dialogs/createGroup.vue";
+
+import colorConfigDialog from "../vue/color/colorDialog.vue";
+
+import linkRoomPanel from "../vue/panel/linkerDialog.vue";
+
+import GlobalLinkerPanel from "../vue/panel/globalLinkerPanel.vue";
 
 const {
-  SpinalMountExtention
+  SpinalMountExtention,
 } = require("spinal-env-viewer-panel-manager-service");
 
 const {
-  SpinalForgeExtention
+  SpinalForgeExtention,
 } = require("spinal-env-viewer-panel-manager-service_spinalforgeextention");
 
 const dialogs = [{
     name: "createGroupContextDialog",
-    vueMountComponent: vue.extend(dialogComponent),
-    parentContainer: document.body
+    vueMountComponent: vue.extend(createContextGroup),
+    parentContainer: document.body,
+  },
+  {
+    name: "createCategoryDialog",
+    vueMountComponent: vue.extend(createCategoryDialog),
+    parentContainer: document.body,
+  },
+  {
+    name: "createGroupDialog",
+    vueMountComponent: vue.extend(createGroupDialog),
+    parentContainer: document.body,
   },
   {
     name: "colorConfigDialog",
     vueMountComponent: vue.extend(colorConfigDialog),
-    parentContainer: document.body
+    parentContainer: document.body,
   }
-  // {
-  //   name: "linkRoomDialog",
-  //   vueMountComponent: vue.extend(linkRoomDialog),
-  //   parentContainer: document.body
-  // }
 ];
-
 
 for (let index = 0; index < dialogs.length; index++) {
   SpinalMountExtention.mount(dialogs[index]);
@@ -39,33 +48,31 @@ for (let index = 0; index < dialogs.length; index++) {
 //                     REGISTER PANEL                                    //
 ///////////////////////////////////////////////////////////////////////////
 
-
 let panels = [{
     name: "linkRoomPanel",
-    vueMountComponent: vue.extend(linkRoomDialog),
+    vueMountComponent: vue.extend(linkRoomPanel),
     panel: {
       title: "Link Rooms Panel",
-      closeBehaviour: "hide"
+      closeBehaviour: "hide",
     },
     style: {
       height: "475px",
-      left: "400px"
-    }
+      left: "400px",
+    },
   },
   {
     name: "globalLinkRoomPanel",
     vueMountComponent: vue.extend(GlobalLinkerPanel),
     panel: {
       title: "Link",
-      closeBehaviour: "hide"
+      closeBehaviour: "hide",
     },
     style: {
       height: "475px",
-      left: "400px"
-    }
-  }
-]
-
+      left: "400px",
+    },
+  },
+];
 
 for (let index = 0; index < panels.length; index++) {
   const element = panels[index];

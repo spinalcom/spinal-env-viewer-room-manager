@@ -22,6 +22,10 @@ import {
 } from "spinal-env-viewer-plugin-forge/dist/Constants";
 
 import geographicService from "spinal-env-viewer-context-geographic-service";
+import {
+  groupManagerService
+} from "spinal-env-viewer-plugin-group-manager-service";
+
 
 
 let ItemColoredMap = new Map();
@@ -29,32 +33,45 @@ let BimElementsColor = new Map();
 
 
 const ROOMS_RELATIONS = [
-  groupService.constants.CATEGORY_TO_GROUP_RELATION,
-  groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
-  groupService.constants.GROUP_TO_ROOMS_RELATION,
+  // groupService.constants.CATEGORY_TO_GROUP_RELATION,
+  // groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
+  // groupService.constants.GROUP_TO_ROOMS_RELATION,
+  groupManagerService.constants.CATEGORY_TO_GROUP_RELATION,
+  groupManagerService.constants.CONTEXT_TO_CATEGORY_RELATION,
+  groupManagerService.constants.OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION,
+  `groupHas${geographicService.constants.ROOM_TYPE}`,
   geographicService.constants.REFERENCE_RELATION,
   geographicService.constants.EQUIPMENT_RELATION
 ]
 
 
 const EQUIPMENTS_RELATIONS = [
-  groupService.constants.CATEGORY_TO_GROUP_RELATION,
-  groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
-  groupService.constants.GROUP_TO_EQUIPMENTS_RELATION
+  // groupService.constants.CATEGORY_TO_GROUP_RELATION,
+  // groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
+  groupManagerService.constants.CATEGORY_TO_GROUP_RELATION,
+  groupManagerService.constants.CONTEXT_TO_CATEGORY_RELATION,
+  groupManagerService.constants.OLD_RELATIONS_TYPES
+  .GROUP_TO_EQUIPMENTS_RELATION,
+  `groupHas${geographicService.constants.EQUIPMENT_TYPE}`
 ]
 
 
 const ROOMS_TYPES = [
-  groupService.constants.ROOMS_GROUP_CONTEXT,
-  groupService.constants.CATEGORY_TYPE,
-  groupService.constants.ROOMS_GROUP
+  groupManagerService.constants.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT,
+  groupManagerService.constants.CATEGORY_TYPE,
+  groupManagerService.constants.OLD_GROUPS_TYPES.ROOMS_GROUP,
+  `${geographicService.constants.ROOM_TYPE}GroupContext`,
+  `${geographicService.constants.ROOM_TYPE}Group`
 ]
 
 // eslint-disable-next-line no-unused-vars
 const EQUIPMENTS_TYPES = [
-  groupService.constants.EQUIPMENTS_GROUP_CONTEXT,
-  groupService.constants.CATEGORY_TYPE,
-  groupService.constants.EQUIPMENTS_GROUP
+  groupManagerService.constants.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT,
+  groupManagerService.constants.CATEGORY_TYPE,
+  groupManagerService.constants.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP,
+  `${geographicService.constants.EQUIPMENT_TYPE}GroupContext`,
+  `${geographicService.constants.EQUIPMENT_TYPE}Group`
+
 ]
 
 
@@ -117,7 +134,7 @@ let utilities = {
     let type = selectedNode.type.get();
     let nodeId = selectedNode.id.get();
 
-    if (groupService.constants.GROUPS_TYPES.indexOf(type) !== -1) {
+    if (groupManagerService.isGroup(type)) {
       return Promise.resolve([selectedNode]);
     }
 
@@ -125,7 +142,7 @@ let utilities = {
 
     return SpinalGraphService.findNodes(nodeId, relations, (node) => {
       let argType = node.getType().get()
-      return groupService.constants.GROUPS_TYPES.indexOf(argType) !== -1;
+      return groupManagerService.isGroup(argType);
     }).then(res => {
       return res.map(el => {
         SpinalGraphService._addNode(el);
@@ -164,8 +181,9 @@ let utilities = {
         ._convertHexColorToRGB(argColor) : this._convertHexColorToRGB(
           "#000000");
 
+      ItemColoredMap.set(groupId, groupId);
+
       res.forEach(child => {
-        ItemColoredMap.set(groupId, groupId);
         let BimColors = BimElementsColor.get(child.dbid.get()) ?
           BimElementsColor.get(child.dbid.get()) : [];
 
@@ -178,6 +196,8 @@ let utilities = {
 
         let model = window.spinal.BimObjectService.getModelByBimfile(
           child.bimFileId.get());
+
+        console.log("model", model)
 
         model.setThemingColor(child.dbid.get(), new THREE.Vector4(
             color.r / 255, color.g / 255, color.b / 255, 0.7, true)

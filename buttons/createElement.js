@@ -7,15 +7,18 @@ import {
 } from "spinal-env-viewer-panel-manager-service";
 
 import {
-  groupService
+  groupManagerService
+} from "spinal-env-viewer-plugin-group-manager-service";
 
-} from "../services/service";
+// import {
+//   groupService
+// } from "../services/service";
 
-let typeLst = [
-  ...groupService.constants.CONTEXTS_TYPES,
-  ...groupService.constants.GROUPS_TYPES,
-  groupService.constants.CATEGORY_TYPE
-]
+// let typeLst = [
+//   ...groupService.constants.CONTEXTS_TYPES,
+//   ...groupService.constants.GROUPS_TYPES,
+//   groupService.constants.CATEGORY_TYPE
+// ]
 
 class CreateElement extends SpinalContextApp {
   constructor() {
@@ -29,33 +32,55 @@ class CreateElement extends SpinalContextApp {
   }
 
   isShown(option) {
-    let type = option.selectedNode.type.get();
+    const type = option.selectedNode.type.get();
     // if (type === ROOMS_GROUP_CONTEXT || type === EQUIPMENTS_GROUP_CONTEXT)
     // return Promise.resolve(true);
-    return Promise.resolve(typeLst.indexOf(type));
+    // return Promise.resolve(typeLst.indexOf(type));
+
+    const isContext = groupManagerService.isContext(type);
+    const isCategory = groupManagerService.isCategory(type);
+    const isGroup = groupManagerService.isGroup(type);
+
+    if (isContext || isCategory || isGroup) {
+      return Promise.resolve(true);
+    }
+
+    return Promise.resolve(-1);
+
   }
 
   action(option) {
-    let nodeType = option.selectedNode.type.get();
+    let type = option.selectedNode.type.get();
 
-    let parameters = {
+    const parameters = {
       title: "",
-      type: "element",
       contextId: option.context.id.get(),
       selectedNode: option.selectedNode
     };
 
-
-    if (groupService.constants.CONTEXTS_TYPES.indexOf(nodeType) !== -1) {
+    if (groupManagerService.isContext(type)) {
       parameters.title = "add Category";
-    } else if (nodeType === groupService.constants.CATEGORY_TYPE) {
+      spinalPanelManagerService.openPanel("createCategoryDialog",
+        parameters);
+    } else if (groupManagerService.isCategory(type)) {
       parameters.title = "add Group";
-    } else if (groupService.constants.GROUPS_TYPES.indexOf(nodeType) !== -1) {
-      parameters["hide"] = true; //don't show the dialog modal
+      spinalPanelManagerService.openPanel("createGroupDialog",
+        parameters);
+    } else {
+
     }
 
-    spinalPanelManagerService.openPanel("createGroupContextDialog",
-      parameters);
+
+    // if (groupService.constants.CONTEXTS_TYPES.indexOf(nodeType) !== -1) {
+    //   parameters.title = "add Category";
+    // } else if (nodeType === groupService.constants.CATEGORY_TYPE) {
+    //   parameters.title = "add Group";
+    // } else if (groupService.constants.GROUPS_TYPES.indexOf(nodeType) !== -1) {
+    //   parameters["hide"] = true; //don't show the dialog modal
+    // }
+
+    // spinalPanelManagerService.openPanel("createGroupContextDialog",
+    //   parameters);
   }
 }
 

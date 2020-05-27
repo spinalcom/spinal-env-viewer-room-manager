@@ -9,6 +9,10 @@ import {
 
 import geographicService from "spinal-env-viewer-context-geographic-service";
 
+import {
+  groupManagerService
+} from "spinal-env-viewer-plugin-group-manager-service";
+
 class ViewChildren extends SpinalContextApp {
   constructor() {
     super("color children", "color all bimobjects inside ", {
@@ -22,7 +26,7 @@ class ViewChildren extends SpinalContextApp {
     let contextType = option.context.type.get();
     let nodeType = option.selectedNode.type.get();
 
-    if (groupService.constants.CONTEXTS_TYPES.indexOf(contextType) !== -1 &&
+    if (groupManagerService.isContext(contextType) &&
       nodeType !== geographicService.constants.EQUIPMENT_TYPE) {
       return utilities.getIcon(option.selectedNode, option.context).then(
         (isColored) => {

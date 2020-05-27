@@ -1,20 +1,31 @@
+<!--
+Copyright 2020 SpinalCom - www.spinalcom.com
+
+This file is part of SpinalCore.
+
+Please read all of the following terms and conditions
+of the Free Software license Agreement ("Agreement")
+carefully.
+
+This Agreement is a legally binding contract between
+the Licensee (as defined below) and SpinalCom that
+sets forth the terms and conditions that govern your
+use of the Program. By installing and/or using the
+Program, you agree to abide by all the terms and
+conditions stated or referenced herein.
+
+If you do not agree to abide by these terms and
+conditions, do not demonstrate your acceptance and do
+not install or use the Program.
+You should have received a copy of the license along
+with this file. If not, see
+<http://resources.spinalcom.com/licenses.pdf>.
+-->
+
 
 <template>
   <md-content class="mdContent">
     <div class="header">
-      <!-- <md-field class="search md-inline">
-        <label>Voice</label>
-        <md-input v-model="voice"></md-input>
-        <md-icon>keyboard_voice</md-icon>
-      </md-field> -->
-
-      <!-- <div class="searchDiv">
-        <input type="search"
-               name="search"
-               id="search">
-
-        </div>
-               -->
 
       <div class="buscar-caja"
            :class="{'isOpened' : isOpened}">
@@ -27,16 +38,14 @@
                v-model="search" />
         <a class="md-icon-button buscar-btn"
            @click="openSearchBar">
-          <!-- <i class="far fa-search"></i> -->
+
           <md-icon>search</md-icon>
         </a>
       </div>
 
-      <!-- <filter-menu></filter-menu> -->
-
     </div>
 
-    <div v-if="tempList.length > 0 && !loaded && !error"
+    <div v-if="tempList.length > 0 && appState === STATES.normal"
          class="_container">
       <md-list class="listItem md-scrollbar">
         <md-list-item class="listContainer"
@@ -59,46 +68,19 @@
       </md-list>
     </div>
 
-    <!-- <md-list v-if="tempList.length > 0 && !loaded">
-      <DynamicScroller :items="tempList"
-                       :min-item-size="10"
-                       class="_container">
-
-        <template v-slot="{item,index,active}">
-
-          <DynamicScrollerItem :item="item"
-                               :active="active"
-                               :data-index="index"></DynamicScrollerItem>
-
-          <md-list-item class="listContainer"
-                        :key="index"
-                        @mouseover="eventMethod('mouseover',item)"
-                        @mouseleave="eventMethod('mouseleave',item)">
-            <span class="md-list-item-text">{{item.name}}</span>
-            <md-button class="md-icon-button"
-                       @click="linkUnlink(item)">
-              <md-icon>{{getIcon(item)}}</md-icon>
-            </md-button>
-          </md-list-item>
-
-        </template>
-
-      </DynamicScroller>
-    </md-list> -->
-
     <div class="_container empty"
-         v-if="tempList.length === 0 && !loaded && !error">
+         v-if="tempList.length === 0 && appState === STATES.normal">
       No Data found !
     </div>
 
     <div class="_container empty"
-         v-if="loaded && !error">
+         v-if="appState === STATES.loading">
       <md-progress-spinner class="spiner"
                            md-mode="indeterminate"></md-progress-spinner>
     </div>
 
     <div class="_container empty"
-         v-if="error">
+         v-if="appState === STATES.error">
       Sorry, Something was wrong. Please retry !!
     </div>
 
@@ -116,6 +98,9 @@
 
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
 import { groupService } from "../../services/service";
+
+import { groupManagerService } from "spinal-env-viewer-plugin-group-manager-service";
+
 const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
@@ -131,34 +116,39 @@ export default {
     // "filter-menu": filterMenu
   },
   data() {
+    this.STATES = {
+      normal: 1,
+      loading: 2,
+      error: 3
+    };
     this.data = [];
     this.contextId;
     this.groupId;
     this.countPerPage = 10;
+
     return {
       search: "",
       isOpened: false,
-      title: "",
+      title: "Link Rooms",
       tempList: [],
       dataLinked: [],
       currentPage: 1,
-      loaded: true,
-      error: false,
+      appState: this.STATES.normal,
       categorySumary: []
     };
   },
   methods: {
     opened(option) {
-      this.loaded = true;
-      this.error = false;
+      this.appState = this.STATES.loading;
+
       this.contextId = option.contextId;
       this.groupId = option.nodeId;
 
-      this.title =
-        "Link " +
-        (option.type === groupService.constants.ROOMS_GROUP
-          ? "Rooms"
-          : "BimObject");
+      // this.title =
+      //   "Link " +
+      //   (option.type === groupService.constants.ROOMS_GROUP
+      //     ? "Rooms"
+      //     : "BimObject");
       this.setTitle(this.title);
       let refContext = SpinalGraphService.getContext(option.reference.context);
 
@@ -166,7 +156,7 @@ export default {
         this.tempList = [];
         this.data = [];
         this.dataLinked = [];
-        this.loaded = false;
+        this.appState = this.STATES.normal;
         return;
       }
 
@@ -178,21 +168,19 @@ export default {
         this.getOtherGroupData(option.nodeId)
       ])
         .then(res => {
+          console.log("res", res);
+
           this.data = res[0];
           this.tempList = res[0];
           this.dataLinked = res[1];
           this.categorySumary = res[2];
 
-          this.loaded = false;
+          this.appState = this.STATES.normal;
         })
-        .catch(() => {
-          // console.log(error);
-
-          this.error = true;
+        .catch(err => {
+          this.appState = this.STATES.error;
+          console.error(err);
         });
-
-      // this.data = await this.getData(refContextId, option.reference.relation);
-      // this.dataLinked = await this.getDataLinked(option.nodeId);
     },
 
     getData(parentId, relationName) {
@@ -202,22 +190,53 @@ export default {
         }
       );
     },
+
     getDataLinked(id) {
-      return groupService.getElementsLinked(id).then(res => {
-        return res.map(el => el.get());
+      // return groupService.getElementsLinked(id).then(res => {
+      //   return res.map(el => el.get());
+      // });
+
+      return groupManagerService.getElementsLinkedToGroup(id).then(result => {
+        return result.map(el => el.get());
       });
     },
+
+    async getOtherGroupData(nodeId) {
+      let category = await groupManagerService.getGroupCategory(nodeId);
+
+      if (category) {
+        let groups = await groupManagerService.getGroups(category.id.get());
+        let groupFiltered = groups.filter(child => {
+          return child.id.get() !== nodeId;
+        });
+
+        return groupFiltered.map(el => {
+          return {
+            id: el.id.get(),
+            name: el.name.get(),
+            color: el.color ? el.color.get() : "#000000",
+            children: SpinalGraphService.getChildrenIds(el.id.get())
+          };
+        });
+      }
+
+      return [];
+    },
+
     setTitle(title) {
       spinalPanelManagerService.panels.linkRoomPanel.panel.setTitle(title);
     },
+
     isLinked(item) {
       return this.dataLinked.find(el => {
         return item.id === el.id;
       });
     },
+
     getIcon(item) {
       return typeof this.isLinked(item) === "undefined" ? "link" : "link_off";
     },
+
     deleteItem(item) {
       for (let i = 0; i < this.dataLinked.length; i++) {
         const element = this.dataLinked[i];
@@ -227,70 +246,45 @@ export default {
         }
       }
     },
-    linkUnlink(item) {
+
+    async linkUnlink(item) {
       if (this.isLinked(item)) {
-        groupService.removeLink(this.groupId, item.id).then(() => {
-          this.deleteItem(item);
-        });
+        await groupManagerService.unLinkElementToGroup(this.groupId, item.id);
+        this.deleteItem(item);
       } else {
-        groupService
-          .linkElementToGroup(this.groupId, item.id, this.contextId)
-          .then(res => {
-            if (typeof res.old_group !== "undefined") {
-              let group = this.categorySumary.find(el => {
-                return el.id === res.old_group;
-              });
+        const res = await groupManagerService.linkElementToGroup(
+          this.contextId,
+          this.groupId,
+          item.id
+        );
 
-              if (typeof group !== "undefined") {
-                group.children = group.children.filter(el => {
-                  return el !== item.id;
-                });
-              }
-            }
-
-            this.dataLinked.push(item);
+        if (typeof res.old_group !== "undefined") {
+          let group = this.categorySumary.find(el => {
+            return el.id === res.old_group;
           });
+
+          if (typeof group !== "undefined") {
+            group.children = group.children.filter(el => {
+              return el !== item.id;
+            });
+          }
+        }
+
+        this.dataLinked.push(item);
       }
     },
+
     eventMethod(eventName, item) {
       EventBus.$emit(eventName, item);
     },
+
     openSearchBar() {
       this.isOpened = !this.isOpened;
     },
-    getOtherGroupData(nodeId) {
-      return groupService
-        .getCategorie(SpinalGraphService.getInfo(nodeId))
-        .then(res => {
-          let parent = res ? res[0] : undefined;
 
-          if (parent) {
-            // let type = parent.type.get();
-            let relationName =
-              groupService.constants.CATEGORY_TO_GROUP_RELATION;
-
-            return SpinalGraphService.getChildren(parent.id.get(), [
-              relationName
-            ]).then(children => {
-              return children
-                .filter(child => {
-                  return child.id.get() !== nodeId;
-                })
-                .map(el => {
-                  // console.log("el", el);
-                  return {
-                    id: el.id.get(),
-                    name: el.name.get(),
-                    color: el.color ? el.color.get() : "#000000",
-                    children: el.childrenIds
-                  };
-                });
-            });
-          }
-        });
-    },
     elementExistInCategory(item) {
       let id = item.id;
+
       let parent = this.categorySumary.find(el => {
         return el.children.indexOf(id) !== -1;
       });
@@ -353,10 +347,11 @@ export default {
 }
 
 ._container .listItem {
-  width: 100%;
-  height: calc(100% - 80px);
+  width: 98%;
+  height: calc(100% - 40px);
   overflow: hidden;
   overflow-y: auto;
+  margin: auto;
 }
 
 .empty {
