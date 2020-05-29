@@ -34,7 +34,7 @@ with this file. If not, see
           <md-input v-model="inputValue"></md-input>
         </md-field>
 
-        <div>
+        <div v-if="!pre.selected">
           <span class="md-title">Choose :</span>
 
           <md-radio class="md-primary"
@@ -42,6 +42,10 @@ with this file. If not, see
                     :key="index"
                     v-model="typeSelected"
                     :value="t.type">{{ t.name }}</md-radio>
+        </div>
+
+        <div v-else>
+          type selected : {{pre.type}}
         </div>
 
       </div>
@@ -75,18 +79,33 @@ export default {
       showDialog: true,
       title: "",
       inputValue: "",
-      typeSelected: geographicService.constants.ROOM_TYPE
+      typeSelected: geographicService.constants.ROOM_TYPE,
+      pre: {
+        selected: false,
+        type: undefined
+      }
     };
   },
 
   methods: {
     opened(option) {
       this.title = option.title;
+
+      if (option.typePreselected) {
+        this.pre.selected = true;
+        this.pre.type = option.typePreselected;
+      } else {
+        this.pre.selected = false;
+        this.pre.type = undefined;
+      }
     },
 
     removed(closed) {
       if (closed) {
         let value = this.inputValue.trim();
+
+        if (this.pre.selected) this.typeSelected = this.pre.type;
+
         groupManagerService
           .createGroupContext(value, this.typeSelected)
           .then(_res => {
