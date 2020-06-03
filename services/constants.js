@@ -127,4 +127,4 @@ class GroupServiceConstants {
 
 }
 
-export default new GroupServiceConstants();
+module.exports = new GroupServiceConstants();

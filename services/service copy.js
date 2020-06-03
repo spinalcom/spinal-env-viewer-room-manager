@@ -1,13 +1,13 @@
-const {
+import {
   SPINAL_RELATION_PTR_LST_TYPE,
   SpinalGraphService
-} = require("spinal-env-viewer-graph-service");
+} from "spinal-env-viewer-graph-service";
 
-const {
+import {
   Model
-} = require("spinal-core-connectorjs_type");
+} from "spinal-core-connectorjs_type";
 
-const constants = require("./constants");
+import constants from "./constants";
 
 
 let groupService = {
@@ -313,7 +313,7 @@ let groupService = {
 
 };
 
-module.exports = {
+export {
   // ROOMS_GROUP_CONTEXT,
   // ROOMS_GROUP,
   // EQUIPMENTS_GROUP,
