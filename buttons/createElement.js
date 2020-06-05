@@ -10,6 +10,11 @@ import {
   groupManagerService
 } from "spinal-env-viewer-plugin-group-manager-service";
 
+import {
+  bimObjectManagerService
+} from "spinal-env-viewer-bim-manager-service";
+
+
 // import {
 //   groupService
 // } from "../services/service";
@@ -40,8 +45,9 @@ class CreateElement extends SpinalContextApp {
     const isContext = groupManagerService.isContext(type);
     const isCategory = groupManagerService.isCategory(type);
     const isGroup = groupManagerService.isGroup(type);
+    const isEquipmentGroup = groupManagerService.isEquipementGroup(type);
 
-    if (isContext || isCategory || isGroup) {
+    if (isContext || isCategory || (isGroup && isEquipmentGroup)) {
       return Promise.resolve(true);
     }
 
@@ -50,7 +56,9 @@ class CreateElement extends SpinalContextApp {
   }
 
   action(option) {
-    let type = option.selectedNode.type.get();
+    const nodeId = option.selectedNode.id.get();
+    const type = option.selectedNode.type.get();
+    const contextId = option.context.id.get();
 
     const parameters = {
       title: "",
@@ -67,7 +75,7 @@ class CreateElement extends SpinalContextApp {
       spinalPanelManagerService.openPanel("createGroupDialog",
         parameters);
     } else {
-
+      addBimObject(contextId, nodeId);
     }
 
 
@@ -83,5 +91,60 @@ class CreateElement extends SpinalContextApp {
     //   parameters);
   }
 }
+
+const addBimObject = (contextId, groupId) => {
+  let selections = window.spinal.ForgeViewer.viewer.getAggregateSelection();
+
+  if (selections.length === 0) {
+    alert("select an item");
+    return;
+  }
+
+  selections = selections.map(el => {
+    return bimObjectManagerService.getLeafDbIds(el.model, el.selection);
+  });
+
+  Promise.all(selections).then(selected => {
+    for (let idx = 0; idx < selected.length; idx++) {
+      const {
+        model,
+        selection
+      } = selected[idx];
+
+      model.getBulkProperties(
+        selection, {
+          propFilter: ["name"]
+        },
+        el => {
+          el.forEach(element => {
+            window.spinal.BimObjectService.createBIMObject(
+              element.dbId,
+              element.name,
+              model
+            ).then(() => {
+
+              window.spinal.BimObjectService.getBIMObject(
+                element.dbId,
+                model
+              ).then(bimObject => {
+
+                if (bimObject) {
+                  const bimId = bimObject.id ?
+                    bimObject.id.get() :
+                    bimObject.info.id.get()
+
+                  groupManagerService.linkElementToGroup(
+                    contextId, groupId, bimId)
+
+                }
+              });
+            });
+          });
+        }
+      );
+    }
+  });
+}
+
 
 export default CreateElement;
