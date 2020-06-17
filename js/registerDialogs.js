@@ -3,12 +3,13 @@ import vue from "vue";
 import createContextGroup from "../vue/dialogs/createContext.vue";
 import createCategoryDialog from "../vue/dialogs/createCategory.vue";
 import createGroupDialog from "../vue/dialogs/createGroup.vue";
-
 import colorConfigDialog from "../vue/color/colorDialog.vue";
+import LinkToGroup from "../vue/linkToGroup/linkToGroup.vue";
+
 
 import linkRoomPanel from "../vue/panel/linkerDialog.vue";
-
 import GlobalLinkerPanel from "../vue/panel/globalLinkerPanel.vue";
+
 
 const {
   SpinalMountExtention,
@@ -19,6 +20,11 @@ const {
 } = require("spinal-env-viewer-panel-manager-service_spinalforgeextention");
 
 const dialogs = [{
+    name: "linkToGroupDialog",
+    vueMountComponent: vue.extend(LinkToGroup),
+    parentContainer: document.body
+  },
+  {
     name: "createGroupContextDialog",
     vueMountComponent: vue.extend(createContextGroup),
     parentContainer: document.body,

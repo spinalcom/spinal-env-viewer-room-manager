@@ -9,6 +9,8 @@ import LinkRooms from "./buttons/linkRooms";
 // import AddToReference from "./buttons/addToReferenceContext";
 import ViewChildren from "./buttons/viewBtn";
 
+import FindRoom from "./buttons/findBimRoom";
+
 import {
   spinalContextMenuService
 } from "spinal-env-viewer-context-menu-service";
@@ -16,6 +18,7 @@ import {
 
 const SIDEBAR = "GraphManagerSideBar";
 const HEADERBAR = "GraphManagerTopBar";
+const CIRCULARMENU = 'circularMenu';
 
 
 
@@ -24,6 +27,7 @@ spinalContextMenuService.registerApp(SIDEBAR, new CreateElement(), [3]);
 spinalContextMenuService.registerApp(SIDEBAR, new ViewChildren(), [31]);
 spinalContextMenuService.registerApp(SIDEBAR, new Edit(), [3]);
 spinalContextMenuService.registerApp(SIDEBAR, new LinkRooms(), [3]);
+spinalContextMenuService.registerApp(CIRCULARMENU, new FindRoom(), [3]);
 // spinalContextMenuService.registerApp(SIDEBAR, new AddToReference());
 
 
