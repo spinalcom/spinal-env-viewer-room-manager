@@ -17,17 +17,17 @@ const {
   spinalPanelManagerService
 } = require("spinal-env-viewer-panel-manager-service");
 
-import graphManagerStore from "spinal-env-viewer-plugin-graph-manager/src/vue/store";
 
-class FindBimRoom extends SpinalContextApp {
+class AddRoomToGroup extends SpinalContextApp {
 
   constructor() {
-    super("find room", "find room which linked to this object", {
-      icon: 'room',
-      icon_type: 'in',
-      backgroundColor: '#356BAB',
-      fontColor: '#FFFFFF'
-    })
+    super("add room to group",
+      "add room which linked to this object to group", {
+        icon: 'add_location',
+        icon_type: 'in',
+        backgroundColor: '#356BAB',
+        fontColor: '#FFFFFF'
+      })
   }
 
   async isShown(option) {
@@ -42,7 +42,10 @@ class FindBimRoom extends SpinalContextApp {
     const room = await getRoom(option);
 
     if (room) {
-      graphManagerStore.commit("SET_ACTIVE_NODE", room.id.get());
+      spinalPanelManagerService.openPanel("linkToGroupDialog", {
+        type: ROOM_TYPE,
+        itemSelected: [room.get()]
+      });
     } else {
       alert("no room found");
     }
@@ -78,4 +81,4 @@ const getRoom = async (option) => {
   }
 }
 
-export default FindBimRoom;
+export default AddRoomToGroup;
