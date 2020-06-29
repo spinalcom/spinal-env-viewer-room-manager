@@ -26,7 +26,7 @@ with this file. If not, see
   <md-dialog class="mdDialogContainer"
              :md-active.sync="showDialog"
              @md-closed="closeDialog(false)">
-    <md-dialog-title class="dialogTitle">Link To Group</md-dialog-title>
+    <md-dialog-title class="dialogTitle">Manage {{type}} Group</md-dialog-title>
     <md-dialog-content class="content">
 
       <div class="section">

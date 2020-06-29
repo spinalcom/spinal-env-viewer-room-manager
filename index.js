@@ -11,6 +11,8 @@ import ViewChildren from "./buttons/viewBtn";
 
 import FindRoom from "./buttons/findBimRoom";
 import AddRoomToGroup from './buttons/addBimRoomToGroup'
+import AddBimObjectToGroup from "./buttons/addBimObjectToGroup";
+import FindBimObject from "./buttons/findBimObject";
 
 import {
   spinalContextMenuService
@@ -25,11 +27,15 @@ const CIRCULARMENU = 'circularMenu';
 
 spinalContextMenuService.registerApp(HEADERBAR, new ContextGroupBtn(), [3]);
 spinalContextMenuService.registerApp(SIDEBAR, new CreateElement(), [3]);
-spinalContextMenuService.registerApp(SIDEBAR, new ViewChildren(), [31]);
+spinalContextMenuService.registerApp(SIDEBAR, new ViewChildren(), [3]);
 spinalContextMenuService.registerApp(SIDEBAR, new Edit(), [3]);
 spinalContextMenuService.registerApp(SIDEBAR, new LinkRooms(), [3]);
 spinalContextMenuService.registerApp(CIRCULARMENU, new FindRoom(), [3]);
 spinalContextMenuService.registerApp(CIRCULARMENU, new AddRoomToGroup(), [3]);
+spinalContextMenuService.registerApp(CIRCULARMENU, new AddBimObjectToGroup(), [
+  3
+]);
+spinalContextMenuService.registerApp(CIRCULARMENU, new FindBimObject(), [3]);
 // spinalContextMenuService.registerApp(SIDEBAR, new AddToReference());
 
 

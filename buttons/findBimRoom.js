@@ -23,7 +23,7 @@ class FindBimRoom extends SpinalContextApp {
 
   constructor() {
     super("find room", "find room which linked to this object", {
-      icon: 'room',
+      icon: 'store',
       icon_type: 'in',
       backgroundColor: '#356BAB',
       fontColor: '#FFFFFF'

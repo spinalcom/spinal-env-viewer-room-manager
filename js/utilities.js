@@ -22,6 +22,7 @@ import {
 } from "spinal-env-viewer-plugin-forge/dist/Constants";
 
 import geographicService from "spinal-env-viewer-context-geographic-service";
+
 import {
   groupManagerService
 } from "spinal-env-viewer-plugin-group-manager-service";
@@ -283,6 +284,47 @@ let utilities = {
         b: parseInt(result[3], 16)
       } :
       null;
+  },
+
+
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  //                                    Parcours ascendant                                 //
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  async getGeographicTree(endNodeId) {
+
+    let obj = {
+      id: endNodeId,
+      children: []
+    }
+
+    let parents = [];
+
+    do {
+
+      let tempParents = await SpinalGraphService.getParents(id,
+        geographicService
+        .constants.GEOGRAPHIC_RELATIONS);
+
+      parents = tempParents && tempParents.map(el => el.get());
+
+      // parent && result.push(parent.get());
+
+      // id = (parent && parent.id) && parent.id.get();
+
+    } while (parents.length);
+
+    // return result;
+
+
+  },
+
+  addObjToParent(obj, parentId) {
+    return {
+      id: parentId,
+      children: obj
+    }
   }
 
 

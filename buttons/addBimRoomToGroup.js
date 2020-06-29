@@ -23,7 +23,7 @@ class AddRoomToGroup extends SpinalContextApp {
   constructor() {
     super("add room to group",
       "add room which linked to this object to group", {
-        icon: 'add_location',
+        icon: 'playlist_add',
         icon_type: 'in',
         backgroundColor: '#356BAB',
         fontColor: '#FFFFFF'

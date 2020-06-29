@@ -23,13 +23,16 @@ class ContextGroupBtn extends SpinalContextApp {
   }
 
   action() {
-    let parameters = {
-      title: "Create a Grouping Context",
-      type: "context"
-    }
+    // let parameters = {
+    //   title: "Create a Grouping Context",
+    //   type: "context"
+    // }
 
-    spinalPanelManagerService.openPanel("createGroupContextDialog",
-      parameters);
+    // spinalPanelManagerService.openPanel("createGroupContextDialog",
+    //   parameters);
+
+    spinalPanelManagerService.openPanel("selectGroupTypeDialog");
+
 
   }
 

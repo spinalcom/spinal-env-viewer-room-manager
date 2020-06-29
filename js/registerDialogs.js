@@ -10,6 +10,7 @@ import LinkToGroup from "../vue/linkToGroup/linkToGroup.vue";
 import linkRoomPanel from "../vue/panel/linkerDialog.vue";
 import GlobalLinkerPanel from "../vue/panel/globalLinkerPanel.vue";
 
+import SelectGroupTypeDialog from "../dialogs/selectTypeDialog.vue";
 
 const {
   SpinalMountExtention,
@@ -43,6 +44,10 @@ const dialogs = [{
     name: "colorConfigDialog",
     vueMountComponent: vue.extend(colorConfigDialog),
     parentContainer: document.body,
+  }, {
+    name: "selectGroupTypeDialog",
+    vueMountComponent: vue.extend(SelectGroupTypeDialog),
+    parentContainer: document.body
   }
 ];
 
