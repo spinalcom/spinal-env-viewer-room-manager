@@ -23,21 +23,26 @@ class ViewChildren extends SpinalContextApp {
   }
 
   isShown(option) {
-    let contextType = option.context.type.get();
-    let nodeType = option.selectedNode.type.get();
+    const contextType = option.context.type.get();
+    const nodeType = option.selectedNode.type.get();
 
-    if (groupManagerService.isContext(contextType) &&
-      nodeType !== geographicService.constants.EQUIPMENT_TYPE) {
-      return utilities.getIcon(option.selectedNode, option.context).then(
-        (isColored) => {
-          this.buttonCfg["isColored"] = isColored;
-          this.buttonCfg.icon = isColored ? "visibility_off" : "visibility";
-          return true;
-        })
 
-    } else {
+    const isRoomOrEquipmentGroupContext = groupManagerService
+      .isRoomGroupContext(contextType) || groupManagerService
+      .isEquipmentGroupContext(contextType);
+
+
+    if (!isRoomOrEquipmentGroupContext || nodeType === geographicService
+      .constants.EQUIPMENT_TYPE) {
       return Promise.resolve(-1);
     }
+
+    return utilities.getIcon(option.selectedNode, option.context).then(
+      (isColored) => {
+        this.buttonCfg["isColored"] = isColored;
+        this.buttonCfg.icon = isColored ? "visibility_off" : "visibility";
+        return true;
+      })
 
   }
 
@@ -56,10 +61,6 @@ class ViewChildren extends SpinalContextApp {
   }
 
 }
-
-
-
-
 
 
 
