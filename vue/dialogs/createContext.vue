@@ -82,8 +82,9 @@ export default {
       typeSelected: geographicService.constants.ROOM_TYPE,
       pre: {
         selected: false,
-        type: undefined
-      }
+        type: undefined,
+      },
+      callback: () => {},
     };
   },
 
@@ -98,6 +99,8 @@ export default {
         this.pre.selected = false;
         this.pre.type = undefined;
       }
+
+      if (option.callback) this.callback = option.callback;
     },
 
     removed(closed) {
@@ -108,7 +111,7 @@ export default {
 
         groupManagerService
           .createGroupContext(value, this.typeSelected)
-          .then(_res => {
+          .then((_res) => {
             this.sentEvent(_res.info.id.get());
           });
       }
@@ -130,13 +133,13 @@ export default {
 
     isDisabled() {
       return this.inputValue.trim().length === 0;
-    }
+    },
   },
   filters: {
-    toUpperCase: function(data) {
+    toUpperCase: function (data) {
       return data.toUpperCase();
-    }
-  }
+    },
+  },
 };
 </script>
 

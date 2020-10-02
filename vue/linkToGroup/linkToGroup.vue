@@ -79,7 +79,7 @@ import LinkToGroupTemplate from "./linkToGroupTemplate.vue";
 export default {
   name: "dialogComponent",
   components: {
-    "link-template": LinkToGroupTemplate
+    "link-template": LinkToGroupTemplate,
   },
   props: ["onFinised"],
   data() {
@@ -93,12 +93,12 @@ export default {
       groupSelected: undefined,
       items: [],
       type: undefined,
-      callback: undefined
+      callback: undefined,
     };
   },
 
   mounted() {
-    EventBus.$on("itemCreated", id => {
+    EventBus.$on("itemCreated", (id) => {
       this.getAllData();
     });
   },
@@ -114,7 +114,7 @@ export default {
 
     removed(option) {
       if (option) {
-        this.items.forEach(el => {
+        this.items.forEach((el) => {
           attributeService.linkItem(
             this.contextSelected,
             this.groupSelected,
@@ -123,11 +123,13 @@ export default {
         });
 
         if (typeof this.callback !== "undefined") {
-          const context = this.data.find(el => el.id === this.contextSelected);
-          const category = this.categories.find(
-            el => el.id === this.categorySelected
+          const context = this.data.find(
+            (el) => el.id === this.contextSelected
           );
-          const group = this.groups.find(el => el.id === this.groupSelected);
+          const category = this.categories.find(
+            (el) => el.id === this.categorySelected
+          );
+          const group = this.groups.find((el) => el.id === this.groupSelected);
 
           this.callback(context, category, group);
         }
@@ -142,7 +144,7 @@ export default {
     },
 
     getAllData() {
-      attributeService.getAllGroupContext(this.type).then(res => {
+      attributeService.getAllGroupContext(this.type).then((res) => {
         this.data = res;
         this.updateCategory();
         this.updateGroups();
@@ -161,10 +163,10 @@ export default {
       this.groupSelected = undefined;
 
       if (this.contextSelected && this.categorySelected) {
-        let context = this.data.find(el => el.id === this.contextSelected);
+        let context = this.data.find((el) => el.id === this.contextSelected);
         if (context) {
           let category = context.category.find(
-            el => el.id == this.categorySelected
+            (el) => el.id == this.categorySelected
           );
 
           if (category) return category.groups;
@@ -185,7 +187,7 @@ export default {
       spinalPanelManagerService.openPanel("createGroupContextDialog", {
         title: "Create a Grouping Context",
         typePreselected: this.type,
-        callback: id => (this.contextSelected = id)
+        callback: (id) => (this.contextSelected = id),
       });
     },
 
@@ -194,7 +196,7 @@ export default {
         title: "add Category",
         contextId: this.contextSelected,
         selectedNode: SpinalGraphService.getInfo(this.contextSelected),
-        callback: id => (this.categorySelected = id)
+        callback: (id) => (this.categorySelected = id),
       });
     },
 
@@ -203,7 +205,7 @@ export default {
         title: "add Group",
         contextId: this.contextSelected,
         selectedNode: SpinalGraphService.getInfo(this.categorySelected),
-        callback: id => (this.groupSelected = id)
+        callback: (id) => (this.groupSelected = id),
       });
     },
 
@@ -215,7 +217,7 @@ export default {
       // this.categorySelected = undefined;
       this.categories = [];
       if (this.contextSelected) {
-        let val = this.data.find(el => el.id === this.contextSelected);
+        let val = this.data.find((el) => el.id === this.contextSelected);
         if (val) this.categories = val.category;
       }
     },
@@ -224,10 +226,10 @@ export default {
       // this.groupSelected = undefined;
       this.groups = [];
       if (this.contextSelected && this.categorySelected) {
-        let context = this.data.find(el => el.id === this.contextSelected);
+        let context = this.data.find((el) => el.id === this.contextSelected);
         if (context) {
           let category = context.category.find(
-            el => el.id == this.categorySelected
+            (el) => el.id == this.categorySelected
           );
 
           if (category) this.groups = category.groups;
@@ -245,7 +247,7 @@ export default {
 
     selectGroup(id) {
       this.groupSelected = id;
-    }
+    },
   },
   watch: {
     contextSelected() {
@@ -260,8 +262,8 @@ export default {
       this.groupSelected = undefined;
 
       this.updateGroups();
-    }
-  }
+    },
+  },
 };
 </script>
 

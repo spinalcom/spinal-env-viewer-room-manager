@@ -59,7 +59,7 @@ export default {
   name: "createGroupDialog",
   props: ["onFinised"],
   components: {
-    "chrome-picker": Chrome
+    "chrome-picker": Chrome,
   },
   data() {
     this.edit;
@@ -70,7 +70,7 @@ export default {
       color: "#000000",
       inputValue: "",
       selectedNode: undefined,
-      callback: () => {}
+      callback: () => {},
     };
   },
   methods: {
@@ -90,7 +90,7 @@ export default {
 
     removed(closed) {
       if (closed) {
-        this.createElement().then(result => {
+        this.createElement().then((result) => {
           this.sentEvent(result.info.id.get());
         });
       }
@@ -128,15 +128,15 @@ export default {
       } else {
         return groupManagerService.updateGroup(this.selectedNode, {
           name: this.inputValue.trim(),
-          color: color
+          color: color,
         });
       }
-    }
+    },
   },
   filters: {
-    toUpperCase: function(data) {
+    toUpperCase: function (data) {
       return data.toUpperCase();
-    }
-  }
+    },
+  },
 };
 </script>
