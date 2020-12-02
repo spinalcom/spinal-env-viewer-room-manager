@@ -19,6 +19,9 @@ import {
   NOTE_TYPE
 } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants'
 
+import { EVENT_TYPE } from "spinal-env-viewer-task-service";
+
+import { spinalControlPointService } from 'spinal-env-viewer-plugin-control-endpoint-service';
 
 export default [{
     name: "Geographic Context Group",
@@ -63,8 +66,17 @@ export default [{
   {
     name: "EndpointGroup Group",
     type: SpinalBmsEndpointGroup.nodeTypeName
-  }, {
+  }, 
+  {
     name: "Note Group",
     type: NOTE_TYPE
+  }, 
+  {
+    name : "Agenda Group",
+    type : EVENT_TYPE
+  }, 
+  {
+    name : "Control Points group",
+    type : spinalControlPointService.CONTROL_POINT_TYPE
   }
 ];
