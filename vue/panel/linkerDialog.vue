@@ -306,7 +306,7 @@ export default {
         this.tempList = this.data;
       } else {
         this.tempList = this.data.filter(el => {
-          return el.name.toLowerCase().includes(newValue);
+          return el.name.toLowerCase().includes(newValue.toLowerCase());
         });
       }
     }
