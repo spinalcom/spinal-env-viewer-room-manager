@@ -43,11 +43,22 @@ class CreateElement extends SpinalContextApp {
     // return Promise.resolve(typeLst.indexOf(type));
 
     const isContext = groupManagerService.isContext(type);
+    if(isContext) {
+      this.label = "Create Category"
+      return Promise.resolve(true);
+    }
+
     const isCategory = groupManagerService.isCategory(type);
+    if(isCategory) {
+      this.label = "Create Group"
+      return Promise.resolve(true);
+    }
+
     const isGroup = groupManagerService.isGroup(type);
     const isEquipmentGroup = groupManagerService.isEquipementGroup(type);
 
-    if (isContext || isCategory || (isGroup && isEquipmentGroup)) {
+    if(isGroup && isEquipmentGroup) {
+      this.label = "Add equipments selected"
       return Promise.resolve(true);
     }
 

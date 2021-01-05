@@ -10,7 +10,7 @@ import {
 
 class ContextGroupBtn extends SpinalContextApp {
   constructor() {
-    super("create Group", "This Button creates a group context", {
+    super("create Group Context", "This Button creates a group context", {
       icon: "add",
       icon_type: "in",
       backgroundColor: "#FF0000",
