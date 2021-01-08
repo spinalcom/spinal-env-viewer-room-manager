@@ -47,25 +47,54 @@ with this file. If not, see
 
     <div v-if="tempList.length > 0 && appState === STATES.normal"
          class="_container">
-      <md-list class="listItem md-scrollbar">
-        <md-list-item class="listContainer"
-                      v-for="(item, index) in tempList"
-                      :key="index"
-                      @mouseover="eventMethod('mouseover',item)"
-                      @mouseleave="eventMethod('mouseleave',item)">
-          <span class="md-list-item-text">{{item.name}}</span>
 
-          <div v-if="elementExistInCategory(item)"
-               class="groupColor"
-               :style="{backgroundColor : item.groupColor}"
-               :title="'Linked to ' + item.groupName"></div>
+      <!-- <md-content class="listItem md-scrollbar">
+        <md-list class="listcontent">
+          <md-list-item class="listContainer"
+                        v-for="(item, index) in tempList"
+                        :key="index"
+                        @mouseover="eventMethod('mouseover',item)"
+                        @mouseleave="eventMethod('mouseleave',item)">
+            <span class="md-list-item-text">{{item.name}}</span>
 
-          <md-button class="md-icon-button panel_link_button"
-                     @click="linkUnlink(item)">
-            <md-icon>{{getIcon(item)}}</md-icon>
-          </md-button>
-        </md-list-item>
-      </md-list>
+            <div v-if="elementExistInCategory(item)"
+                 class="groupColor"
+                 :style="{backgroundColor : item.groupColor}"
+                 :title="'Linked to ' + item.groupName"></div>
+
+            <md-button class="md-icon-button panel_link_button"
+                       @click="linkUnlink(item)">
+              <md-icon>{{getIcon(item)}}</md-icon>
+            </md-button>
+          </md-list-item>
+        </md-list>
+      </md-content> -->
+
+      <md-content class="listItem md-scrollbar">
+        <RecycleScroller :items="tempList"
+                         :item-size="60"
+                         key-field="id"
+                         v-slot="{ item }">
+
+          <div class="listContainer"
+               @mouseover="eventMethod('mouseover',item)"
+               @mouseleave="eventMethod('mouseleave',item)">
+            <span class="md-list-item-text">{{item.name}}</span>
+
+            <div v-if="elementExistInCategory(item)"
+                 class="groupColor"
+                 :style="{backgroundColor : item.groupColor}"
+                 :title="'Linked to ' + item.groupName"></div>
+
+            <md-button class="md-icon-button panel_link_button"
+                       @click="linkUnlink(item)">
+              <md-icon>{{getIcon(item)}}</md-icon>
+            </md-button>
+          </div>
+
+        </RecycleScroller>
+      </md-content>
+
     </div>
 
     <div class="_container empty"
@@ -88,24 +117,17 @@ with this file. If not, see
 </template>
 
 <script>
-// import Vue from "vue";
-// import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
-
-// Vue.component("DynamicScroller", DynamicScroller);
-// Vue.component("DynamicScrollerItem", DynamicScrollerItem);
-
-// import filterMenu from "../filterMenu/menu.vue";
-
+import Vue from "vue";
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-import { groupService } from "../../services/service";
-
 import { groupManagerService } from "spinal-env-viewer-plugin-group-manager-service";
 
 const {
   spinalPanelManagerService,
 } = require("spinal-env-viewer-panel-manager-service");
 
-// import paginationComponent from "../pagination/paginationComponent.vue";
+import { RecycleScroller } from "vue-virtual-scroller";
+
+Vue.component("RecycleScroller", RecycleScroller);
 
 import EventBus from "../../js/event";
 
@@ -113,7 +135,8 @@ export default {
   name: "linkPanelContent",
   components: {
     // "pagination-component": paginationComponent,
-    // "filter-menu": filterMenu
+    // "filter-menu": filterMenu,
+    // "virtual-scroller": VueVirtualScroller,
   },
   data() {
     this.STATES = {
@@ -322,7 +345,7 @@ export default {
 <style scoped>
 .mdContent {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 15px);
 }
 
 .header {
@@ -332,6 +355,7 @@ export default {
   height: 40px;
   display: flex;
   flex-direction: row-reverse;
+  margin-bottom: 10px;
 }
 
 /* .header .searchDiv {
@@ -342,15 +366,20 @@ export default {
 
 ._container {
   width: 100%;
-  height: calc(100% - 40px);
+  height: calc(100% - 50px);
   overflow: hidden;
 }
 
 ._container .listItem {
   width: 98%;
-  height: calc(100% - 40px);
+  height: calc(100% - 10px);
   overflow: hidden;
   overflow-y: auto;
+  margin: auto;
+}
+
+._container .listItem .listcontent {
+  width: 95%;
   margin: auto;
 }
 
@@ -368,7 +397,14 @@ export default {
 }
 
 .listContainer {
+  width: 95%;
+  height: 60px;
+  font-size: 1.2em;
+  padding: 0 5px 0 5px;
   border-bottom: 1px solid white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .listContainer:hover {
@@ -475,6 +511,85 @@ export default {
   line-height: 40px;
   width: 0px;
   /* font-weight: bold; */
+}
+
+/*
+//////////////////////////////////////////////////////////
+//                VUe scroll
+//////////////////////////////////////////////////////////
+*/
+.vue-recycle-scroller {
+  position: relative;
+}
+.vue-recycle-scroller.direction-vertical:not(.page-mode) {
+  overflow-y: auto;
+}
+.vue-recycle-scroller.direction-horizontal:not(.page-mode) {
+  overflow-x: auto;
+}
+.vue-recycle-scroller.direction-horizontal {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.vue-recycle-scroller__slot {
+  -webkit-box-flex: 1;
+  -ms-flex: auto 0 0px;
+  flex: auto 0 0;
+}
+.vue-recycle-scroller__item-wrapper {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+}
+.vue-recycle-scroller.ready .vue-recycle-scroller__item-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+.vue-recycle-scroller.direction-vertical .vue-recycle-scroller__item-wrapper {
+  width: 100%;
+}
+.vue-recycle-scroller.direction-horizontal .vue-recycle-scroller__item-wrapper {
+  height: 100%;
+}
+.vue-recycle-scroller.ready.direction-vertical
+  .vue-recycle-scroller__item-view {
+  width: 100%;
+}
+.vue-recycle-scroller.ready.direction-horizontal
+  .vue-recycle-scroller__item-view {
+  height: 100%;
+}
+.resize-observer[data-v-b329ee4c] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: transparent;
+  pointer-events: none;
+  display: block;
+  overflow: hidden;
+  opacity: 0;
+}
+.resize-observer[data-v-b329ee4c] object {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
 }
 </style>
 
