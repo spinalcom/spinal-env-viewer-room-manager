@@ -60,7 +60,7 @@ with this file. If not, see
                :style="{backgroundColor : item.groupColor}"
                :title="'Linked to ' + item.groupName"></div>
 
-          <md-button class="md-icon-button"
+          <md-button class="md-icon-button panel_link_button"
                      @click="linkUnlink(item)">
             <md-icon>{{getIcon(item)}}</md-icon>
           </md-button>
@@ -102,7 +102,7 @@ import { groupService } from "../../services/service";
 import { groupManagerService } from "spinal-env-viewer-plugin-group-manager-service";
 
 const {
-  spinalPanelManagerService
+  spinalPanelManagerService,
 } = require("spinal-env-viewer-panel-manager-service");
 
 // import paginationComponent from "../pagination/paginationComponent.vue";
@@ -119,7 +119,7 @@ export default {
     this.STATES = {
       normal: 1,
       loading: 2,
-      error: 3
+      error: 3,
     };
     this.data = [];
     this.contextId;
@@ -134,7 +134,7 @@ export default {
       dataLinked: [],
       currentPage: 1,
       appState: this.STATES.normal,
-      categorySumary: []
+      categorySumary: [],
     };
   },
   methods: {
@@ -165,9 +165,9 @@ export default {
       Promise.all([
         this.getData(refContextId, option.reference.relation),
         this.getDataLinked(option.nodeId),
-        this.getOtherGroupData(option.nodeId)
+        this.getOtherGroupData(option.nodeId),
       ])
-        .then(res => {
+        .then((res) => {
           console.log("res", res);
 
           this.data = res[0];
@@ -177,7 +177,7 @@ export default {
 
           this.appState = this.STATES.normal;
         })
-        .catch(err => {
+        .catch((err) => {
           this.appState = this.STATES.error;
           console.error(err);
         });
@@ -185,8 +185,8 @@ export default {
 
     getData(parentId, relationName) {
       return SpinalGraphService.getChildren(parentId, relationName).then(
-        res => {
-          return res.map(el => el.get());
+        (res) => {
+          return res.map((el) => el.get());
         }
       );
     },
@@ -196,8 +196,8 @@ export default {
       //   return res.map(el => el.get());
       // });
 
-      return groupManagerService.getElementsLinkedToGroup(id).then(result => {
-        return result.map(el => el.get());
+      return groupManagerService.getElementsLinkedToGroup(id).then((result) => {
+        return result.map((el) => el.get());
       });
     },
 
@@ -206,16 +206,16 @@ export default {
 
       if (category) {
         let groups = await groupManagerService.getGroups(category.id.get());
-        let groupFiltered = groups.filter(child => {
+        let groupFiltered = groups.filter((child) => {
           return child.id.get() !== nodeId;
         });
 
-        return groupFiltered.map(el => {
+        return groupFiltered.map((el) => {
           return {
             id: el.id.get(),
             name: el.name.get(),
             color: el.color ? el.color.get() : "#000000",
-            children: SpinalGraphService.getChildrenIds(el.id.get())
+            children: SpinalGraphService.getChildrenIds(el.id.get()),
           };
         });
       }
@@ -228,7 +228,7 @@ export default {
     },
 
     isLinked(item) {
-      return this.dataLinked.find(el => {
+      return this.dataLinked.find((el) => {
         return item.id === el.id;
       });
     },
@@ -259,12 +259,12 @@ export default {
         );
 
         if (typeof res.old_group !== "undefined") {
-          let group = this.categorySumary.find(el => {
+          let group = this.categorySumary.find((el) => {
             return el.id === res.old_group;
           });
 
           if (typeof group !== "undefined") {
-            group.children = group.children.filter(el => {
+            group.children = group.children.filter((el) => {
               return el !== item.id;
             });
           }
@@ -285,7 +285,7 @@ export default {
     elementExistInCategory(item) {
       let id = item.id;
 
-      let parent = this.categorySumary.find(el => {
+      let parent = this.categorySumary.find((el) => {
         return el.children.indexOf(id) !== -1;
       });
 
@@ -296,21 +296,21 @@ export default {
       }
 
       return false;
-    }
+    },
   },
   watch: {
-    search: function(newValue) {
+    search: function (newValue) {
       newValue = newValue.trim();
       // console.log("newValue", newValue);
       if (newValue.length === 0) {
         this.tempList = this.data;
       } else {
-        this.tempList = this.data.filter(el => {
+        this.tempList = this.data.filter((el) => {
           return el.name.toLowerCase().includes(newValue.toLowerCase());
         });
       }
-    }
-  }
+    },
+  },
   // computed: {
   //   isOpened: function() {
   //     return this.search.trim().length > 0;
@@ -406,6 +406,10 @@ export default {
   padding-left: 5px;
   /* padding-top: 4px;
   padding-bottom: 4px; */
+}
+
+.listContainer .panel_link_button .md-ripple {
+  padding: unset !important;
 }
 
 /*
