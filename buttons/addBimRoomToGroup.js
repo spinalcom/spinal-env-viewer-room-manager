@@ -1,22 +1,11 @@
-import {
-  SpinalContextApp
-} from "spinal-env-viewer-context-menu-service";
-
-import {
-  SpinalGraphService
-} from "spinal-env-viewer-graph-service";
-
-import {
-  EQUIPMENT_RELATION,
-  REFERENCE_RELATION,
-  ROOM_TYPE
-} from "spinal-env-viewer-context-geographic-service/build/constants";
+import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+import { EQUIPMENT_RELATION, REFERENCE_RELATION, ROOM_TYPE } from "spinal-env-viewer-context-geographic-service/build/constants";
+const { spinalPanelManagerService } = require("spinal-env-viewer-panel-manager-service");
+import { spinalContextMenuService } from "spinal-env-viewer-context-menu-service";
 
 
-const {
-  spinalPanelManagerService
-} = require("spinal-env-viewer-panel-manager-service");
-
+const CIRCULARMENU = 'circularMenu';
 
 class AddRoomToGroup extends SpinalContextApp {
 
@@ -81,4 +70,8 @@ const getRoom = async (option) => {
   }
 }
 
-export default AddRoomToGroup;
+const addRoomToGroup = new AddRoomToGroup();
+
+spinalContextMenuService.registerApp(CIRCULARMENU, addRoomToGroup, [3]);
+
+export default addRoomToGroup;

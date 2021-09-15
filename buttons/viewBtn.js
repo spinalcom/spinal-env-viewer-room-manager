@@ -1,17 +1,11 @@
-import {
-  SpinalContextApp
-} from "spinal-env-viewer-context-menu-service";
-
+import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
 import utilities from "../js/utilities";
-import {
-  groupService
-} from "../services/service";
-
 import geographicService from "spinal-env-viewer-context-geographic-service";
+import { groupManagerService } from "spinal-env-viewer-plugin-group-manager-service";
+import { spinalContextMenuService } from "spinal-env-viewer-context-menu-service";
 
-import {
-  groupManagerService
-} from "spinal-env-viewer-plugin-group-manager-service";
+const SIDEBAR = "GraphManagerSideBar";
+
 
 class ViewChildren extends SpinalContextApp {
   constructor() {
@@ -62,6 +56,8 @@ class ViewChildren extends SpinalContextApp {
 
 }
 
+const viewChildren = new ViewChildren();
 
+spinalContextMenuService.registerApp(SIDEBAR, viewChildren, [3]);
 
-export default ViewChildren;
+export default viewChildren;

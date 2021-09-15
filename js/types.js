@@ -1,27 +1,9 @@
-import {
-  CONTEXT_TYPE,
-  SITE_TYPE,
-  BUILDING_TYPE,
-  FLOOR_TYPE,
-  ZONE_TYPE,
-  ROOM_TYPE,
-  EQUIPMENT_TYPE
-} from "spinal-env-viewer-context-geographic-service/build/constants";
-
-import {
-  SpinalBmsEndpoint,
-  SpinalBmsDevice,
-  SpinalBmsNetwork,
-  SpinalBmsEndpointGroup
-} from "spinal-model-bmsnetwork";
-
-import {
-  NOTE_TYPE
-} from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants'
-
+import {CONTEXT_TYPE, SITE_TYPE, BUILDING_TYPE, FLOOR_TYPE, ZONE_TYPE, ROOM_TYPE, EQUIPMENT_TYPE } from "spinal-env-viewer-context-geographic-service/build/constants";
+import { SpinalBmsEndpoint, SpinalBmsDevice, SpinalBmsNetwork, SpinalBmsEndpointGroup } from "spinal-model-bmsnetwork";
+import { NOTE_TYPE } from 'spinal-env-viewer-plugin-documentation-service/dist/Models/constants'
 import { EVENT_TYPE } from "spinal-env-viewer-task-service";
-
 import { spinalControlPointService } from 'spinal-env-viewer-plugin-control-endpoint-service';
+import { spinalAnalyticService } from "spinal-env-viewer-plugin-analytics-service";
 
 export default [{
     name: "Geographic Context Group",
@@ -78,5 +60,9 @@ export default [{
   {
     name : "Control Points group",
     type : spinalControlPointService.CONTROL_POINT_TYPE
+  }, 
+  {
+    name: "Analytics group",
+    type: spinalAnalyticService.nodeType
   }
 ];

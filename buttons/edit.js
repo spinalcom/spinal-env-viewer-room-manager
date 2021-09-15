@@ -1,18 +1,9 @@
-import {
-  SpinalContextApp
-} from "spinal-env-viewer-context-menu-service";
+import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
+import { groupManagerService } from "spinal-env-viewer-plugin-group-manager-service";
+import { spinalPanelManagerService } from "spinal-env-viewer-panel-manager-service";
+import { spinalContextMenuService } from "spinal-env-viewer-context-menu-service";
 
-// import {
-//   groupService
-// } from "../services/service";
-
-import {
-  groupManagerService
-} from "spinal-env-viewer-plugin-group-manager-service";
-
-import {
-  spinalPanelManagerService
-} from "spinal-env-viewer-panel-manager-service";
+const SIDEBAR = "GraphManagerSideBar";
 
 class Edit extends SpinalContextApp {
   constructor() {
@@ -23,22 +14,6 @@ class Edit extends SpinalContextApp {
       fontColor: "#FFFFFF"
     });
   }
-
-  // display(contextType, selectedNodeType) {
-
-  //   let tempList = [
-  //     EQUIPMENTS_GROUP,
-  //     ROOMS_GROUP,
-  //     EQUIPMENTS_CATEGORY,
-  //     ROOMS_CATEGORY
-  //   ];
-
-  //   return (
-  //     groupService.constants.CONTEXTS_TYPES.indexOf(contextType) !== -1 && (
-  //       tempList.indexOf(
-  //         selectedNodeType) !== -1)
-  //   );
-  // }
 
   isShown(option) {
     let contextType = option.context.type.get();
@@ -56,8 +31,6 @@ class Edit extends SpinalContextApp {
   }
 
   action(option) {
-
-
     let type = option.selectedNode.type.get();
 
     let params = {
@@ -79,9 +52,11 @@ class Edit extends SpinalContextApp {
       spinalPanelManagerService.openPanel("createCategoryDialog", params);
     }
 
-    // spinalPanelManagerService.openPanel("colorConfigDialog", params);
-
   }
 }
 
-export default Edit;
+const edit = new Edit()
+
+spinalContextMenuService.registerApp(SIDEBAR, edit, [3]);
+
+export default edit;

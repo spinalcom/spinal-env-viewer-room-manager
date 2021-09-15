@@ -1,41 +1,32 @@
-import "./js/registerDialogs";
+import "./vue/dialogs";
+import "./vue/panel";
 import "./js/event";
+import "./buttons"
 
-import ContextGroupBtn from "./buttons/createContextGroup";
-import CreateElement from "./buttons/createElement";
-// import DisplayBimObjects from "./buttons/displayBimObject";
-import Edit from './buttons/edit';
-import LinkRooms from "./buttons/linkRooms";
-// import AddToReference from "./buttons/addToReferenceContext";
-import ViewChildren from "./buttons/viewBtn";
+// import ContextGroupBtn from "./buttons/createContextGroup";
+// import CreateElement from "./buttons/createElement";
+// // import DisplayBimObjects from "./buttons/displayBimObject";
+// import Edit from './buttons/edit';
+// import LinkRooms from "./buttons/linkRooms";
+// // import AddToReference from "./buttons/addToReferenceContext";
+// import ViewChildren from "./buttons/viewBtn";
 
-import FindRoom from "./buttons/findBimRoom";
-import AddRoomToGroup from './buttons/addBimRoomToGroup'
-import AddBimObjectToGroup from "./buttons/addBimObjectToGroup";
-import FindBimObject from "./buttons/findBimObject";
+// import FindRoom from "./buttons/findBimRoom";
+// import FindBimObject from "./buttons/findBimObject";
 
-import {
-  spinalContextMenuService
-} from "spinal-env-viewer-context-menu-service";
-
-
-const SIDEBAR = "GraphManagerSideBar";
-const HEADERBAR = "GraphManagerTopBar";
-const CIRCULARMENU = 'circularMenu';
+// import {
+//   spinalContextMenuService
+// } from "spinal-env-viewer-context-menu-service";
 
 
+// const SIDEBAR = "GraphManagerSideBar";
+// const HEADERBAR = "GraphManagerTopBar";
+// const CIRCULARMENU = 'circularMenu';
 
-spinalContextMenuService.registerApp(HEADERBAR, new ContextGroupBtn(), [3]);
-spinalContextMenuService.registerApp(SIDEBAR, new CreateElement(), [3]);
-spinalContextMenuService.registerApp(SIDEBAR, new ViewChildren(), [3]);
-spinalContextMenuService.registerApp(SIDEBAR, new Edit(), [3]);
-spinalContextMenuService.registerApp(SIDEBAR, new LinkRooms(), [3]);
-spinalContextMenuService.registerApp(CIRCULARMENU, new FindRoom(), [3]);
-spinalContextMenuService.registerApp(CIRCULARMENU, new AddRoomToGroup(), [3]);
-spinalContextMenuService.registerApp(CIRCULARMENU, new AddBimObjectToGroup(), [
-  3
-]);
-spinalContextMenuService.registerApp(CIRCULARMENU, new FindBimObject(), [3]);
+
+
+
+
 // spinalContextMenuService.registerApp(SIDEBAR, new AddToReference());
 
 

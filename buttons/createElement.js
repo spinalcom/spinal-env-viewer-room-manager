@@ -1,29 +1,10 @@
-import {
-  SpinalContextApp
-} from "spinal-env-viewer-context-menu-service";
+import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
+import { spinalPanelManagerService } from "spinal-env-viewer-panel-manager-service";
+import { groupManagerService } from "spinal-env-viewer-plugin-group-manager-service";
+import { bimObjectManagerService } from "spinal-env-viewer-bim-manager-service";
+import { spinalContextMenuService } from "spinal-env-viewer-context-menu-service";
 
-import {
-  spinalPanelManagerService
-} from "spinal-env-viewer-panel-manager-service";
-
-import {
-  groupManagerService
-} from "spinal-env-viewer-plugin-group-manager-service";
-
-import {
-  bimObjectManagerService
-} from "spinal-env-viewer-bim-manager-service";
-
-
-// import {
-//   groupService
-// } from "../services/service";
-
-// let typeLst = [
-//   ...groupService.constants.CONTEXTS_TYPES,
-//   ...groupService.constants.GROUPS_TYPES,
-//   groupService.constants.CATEGORY_TYPE
-// ]
+const SIDEBAR = "GraphManagerSideBar";
 
 class CreateElement extends SpinalContextApp {
   constructor() {
@@ -38,10 +19,7 @@ class CreateElement extends SpinalContextApp {
 
   isShown(option) {
     const type = option.selectedNode.type.get();
-    // if (type === ROOMS_GROUP_CONTEXT || type === EQUIPMENTS_GROUP_CONTEXT)
-    // return Promise.resolve(true);
-    // return Promise.resolve(typeLst.indexOf(type));
-
+    
     const isContext = groupManagerService.isContext(type);
     if(isContext) {
       this.label = "Create Category"
@@ -88,18 +66,6 @@ class CreateElement extends SpinalContextApp {
     } else {
       addBimObject(contextId, nodeId);
     }
-
-
-    // if (groupService.constants.CONTEXTS_TYPES.indexOf(nodeType) !== -1) {
-    //   parameters.title = "add Category";
-    // } else if (nodeType === groupService.constants.CATEGORY_TYPE) {
-    //   parameters.title = "add Group";
-    // } else if (groupService.constants.GROUPS_TYPES.indexOf(nodeType) !== -1) {
-    //   parameters["hide"] = true; //don't show the dialog modal
-    // }
-
-    // spinalPanelManagerService.openPanel("createGroupContextDialog",
-    //   parameters);
   }
 }
 
@@ -158,4 +124,8 @@ const addBimObject = (contextId, groupId) => {
 }
 
 
-export default CreateElement;
+const createElement = new CreateElement();
+
+spinalContextMenuService.registerApp(SIDEBAR, createElement, [3]);
+
+export default createElement;

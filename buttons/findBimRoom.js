@@ -1,23 +1,11 @@
-import {
-  SpinalContextApp
-} from "spinal-env-viewer-context-menu-service";
-
-import {
-  SpinalGraphService
-} from "spinal-env-viewer-graph-service";
-
-import {
-  EQUIPMENT_RELATION,
-  REFERENCE_RELATION,
-  ROOM_TYPE
-} from "spinal-env-viewer-context-geographic-service/build/constants";
-
-
-const {
-  spinalPanelManagerService
-} = require("spinal-env-viewer-panel-manager-service");
-
+import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
+import { SpinalGraphService } from "spinal-env-viewer-graph-service";
+import { EQUIPMENT_RELATION, REFERENCE_RELATION, ROOM_TYPE } from "spinal-env-viewer-context-geographic-service/build/constants";
 import graphManagerStore from "spinal-env-viewer-plugin-graph-manager/src/vue/store";
+import { spinalContextMenuService } from "spinal-env-viewer-context-menu-service";
+
+
+const CIRCULARMENU = 'circularMenu';
 
 class FindBimRoom extends SpinalContextApp {
 
@@ -78,4 +66,7 @@ const getRoom = async (option) => {
   }
 }
 
-export default FindBimRoom;
+const findBimRoom = new FindBimRoom();
+spinalContextMenuService.registerApp(CIRCULARMENU, findBimRoom, [3]);
+
+export default findBimRoom;

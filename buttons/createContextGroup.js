@@ -1,12 +1,8 @@
-import {
-  SpinalContextApp
-} from "spinal-env-viewer-context-menu-service";
+import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
+import { spinalPanelManagerService } from "spinal-env-viewer-panel-manager-service";
+import { spinalContextMenuService } from "spinal-env-viewer-context-menu-service";
 
-import {
-  spinalPanelManagerService
-} from "spinal-env-viewer-panel-manager-service";
-
-
+const HEADERBAR = "GraphManagerTopBar";
 
 class ContextGroupBtn extends SpinalContextApp {
   constructor() {
@@ -23,20 +19,14 @@ class ContextGroupBtn extends SpinalContextApp {
   }
 
   action() {
-    // let parameters = {
-    //   title: "Create a Grouping Context",
-    //   type: "context"
-    // }
-
-    // spinalPanelManagerService.openPanel("createGroupContextDialog",
-    //   parameters);
-
     spinalPanelManagerService.openPanel("selectGroupTypeDialog");
-
-
   }
 
 }
 
+const contextGroupBtn = new ContextGroupBtn();
 
-export default ContextGroupBtn;
+spinalContextMenuService.registerApp(HEADERBAR, contextGroupBtn, [3]);
+
+
+export default contextGroupBtn;

@@ -1,25 +1,8 @@
-import {
-  SpinalContextApp
-} from "spinal-env-viewer-context-menu-service";
-
-import {
-  SpinalGraphService
-} from "spinal-env-viewer-graph-service";
-
-import {
-  EQUIPMENT_RELATION,
-  REFERENCE_RELATION,
-  ROOM_TYPE
-} from "spinal-env-viewer-context-geographic-service/build/constants";
-
-
-const {
-  spinalPanelManagerService
-} = require("spinal-env-viewer-panel-manager-service");
-
+import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
 import graphManagerStore from "spinal-env-viewer-plugin-graph-manager/src/vue/store";
+import { spinalContextMenuService } from "spinal-env-viewer-context-menu-service";
 
-import utilities from '../js/utilities';
+const CIRCULARMENU = 'circularMenu';
 
 class FindBimObject extends SpinalContextApp {
 
@@ -33,17 +16,11 @@ class FindBimObject extends SpinalContextApp {
   }
 
   isShown(option) {
-    // return Promise.resolve(true);
-
     return Promise.resolve(option.selectedNode ? true : -1);
-
-    // return typeof bimObject !== "undefined" ? true : -1;
 
   }
 
   action(option) {
-
-    // console.log(utilities.getGeographicTree(option.selectedNode.id.get()));
 
     if (option.selectedNode && option.selectedNode.id) {
       graphManagerStore.commit("SET_ACTIVE_NODE", option.selectedNode.id
@@ -56,4 +33,7 @@ class FindBimObject extends SpinalContextApp {
 
 }
 
-export default FindBimObject;
+const findBimObject = new FindBimObject();
+spinalContextMenuService.registerApp(CIRCULARMENU, findBimObject, [3]);
+
+export default findBimObject;

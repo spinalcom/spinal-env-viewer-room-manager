@@ -1,21 +1,9 @@
-import {
-  SpinalContextApp
-} from "spinal-env-viewer-context-menu-service";
-
-import {
-  SpinalGraphService
-} from "spinal-env-viewer-graph-service";
-
-import {
-  EQUIPMENT_RELATION,
-  REFERENCE_RELATION,
-  ROOM_TYPE
-} from "spinal-env-viewer-context-geographic-service/build/constants";
+import { SpinalContextApp } from "spinal-env-viewer-context-menu-service";
+const { spinalPanelManagerService } = require("spinal-env-viewer-panel-manager-service");
+import { spinalContextMenuService } from "spinal-env-viewer-context-menu-service";
 
 
-const {
-  spinalPanelManagerService
-} = require("spinal-env-viewer-panel-manager-service");
+const CIRCULARMENU = 'circularMenu';
 
 
 class AddBimObjectToGroup extends SpinalContextApp {
@@ -30,17 +18,11 @@ class AddBimObjectToGroup extends SpinalContextApp {
       })
   }
 
-  isShown(option) {
-    // return Promise.resolve(true);
-
-
+  isShown(option) {  
     return Promise.resolve(option.selectedNode !== "undefined" ? true : -1);
-
   }
 
   action(option) {
-    // const bimObject = await getBimObject(option);
-
     if (option.selectedNode) {
       spinalPanelManagerService.openPanel("linkToGroupDialog", {
         type: option.selectedNode.type.get(),
@@ -54,9 +36,7 @@ class AddBimObjectToGroup extends SpinalContextApp {
 
 }
 
+const addBimObjectToGroup = new AddBimObjectToGroup()
 
-// const getBimObject = async (option) => {
-//   console.log(option);
-// }
-
-export default AddBimObjectToGroup;
+spinalContextMenuService.registerApp(CIRCULARMENU, addBimObjectToGroup, [3]);
+export default addBimObjectToGroup;
