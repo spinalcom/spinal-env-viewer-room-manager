@@ -23,14 +23,31 @@ with this file. If not, see
 -->
 
 <template>
-  <div class="myiconDiv">
+
+  <div>
+    <md-autocomplete v-model="iconSelected"
+                     :md-options="icons"
+                     @md-changed="getIcons"
+                     @md-opened="getIcons">
+      <label>Icon</label>
+      <template slot="md-autocomplete-item"
+                slot-scope="{ item }">
+        <div>
+          <md-icon>{{ item }}</md-icon>
+          &nbsp; &nbsp;
+          {{ item }}
+        </div>
+      </template>
+    </md-autocomplete>
+  </div>
+
+  <!-- <div class="myiconDiv">
     <div class="header">
       <div class="md-subheading">Select Icon</div>
       <div class="select">
         <md-field>
           <label for="category">Category</label>
 
-          <!-- @md-selected="filterIcons" -->
           <md-select v-model="categorySelected"
                      name="category"
                      id="category"
@@ -60,11 +77,11 @@ with this file. If not, see
         </div>
       </div>
     </md-content>
-  </div>
+  </div> -->
 </template>
 
 <script>
-import * as allIcons from "../../../js/icons.json";
+import allIcons from "../../../js/icons.json";
 
 export default {
   name: "iconComponent",
@@ -80,6 +97,7 @@ export default {
       iconsDisplayed: Object.values(allIcons),
       iconSelected: null,
       categorySelected: "none",
+      icons: [],
     };
   },
   mounted() {
@@ -118,22 +136,60 @@ export default {
     isSelected(icon) {
       return this.iconSelected === icon;
     },
+
+    getIcons(searchTerm) {
+      this.icons = new Promise((resolve) => {
+        setTimeout(() => {
+          let icons = this.iconsNames();
+          if (!searchTerm) {
+            resolve(icons);
+          } else {
+            const term = searchTerm.toLowerCase();
+
+            resolve(icons.filter((el) => el.toLowerCase().includes(term)));
+          }
+        }, 500);
+      });
+    },
+
+    iconsNames() {
+      if (!this.allIcons) return [];
+      return this.allIcons.reduce((arr, item) => {
+        arr.push(...item.icons.map((el) => el.id));
+        return arr;
+      }, []);
+    },
   },
+
   watch: {
     categorySelected: function () {
       this.filterIcons();
+    },
+    selected() {
+      this.iconSelected = this.selected;
     },
   },
 };
 </script>
 
 <style scoped>
-._container {
+.myiconDiv {
   width: 500px;
   height: 100%;
-  overflow-y: auto;
+}
+
+.myiconDiv .header {
+  width: 100%;
+  height: 80px;
+}
+
+.myiconDiv ._container {
+  width: 99%;
+  height: calc(100% - 70px);
+  overflow: auto;
   overflow-x: hidden;
   display: flex;
+  margin-bottom: 10px;
   flex-direction: column;
 }
 

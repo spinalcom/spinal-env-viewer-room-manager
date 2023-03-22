@@ -80,7 +80,7 @@ export default {
       this.contextId = option.contextId;
 
       this.selectedNode = option.selectedNode.id.get();
-
+      this.iconSelected = "3d_rotation";
       if (this.edit) {
         this.inputValue = option.selectedNode.name.get();
         this.iconSelected = option.iconSelected;

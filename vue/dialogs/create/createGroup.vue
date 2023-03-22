@@ -28,18 +28,21 @@ with this file. If not, see
     <md-dialog-title>{{ title | toUpperCase }}</md-dialog-title>
 
     <md-dialog-content class="dialogContainer">
-      <div>
-        <md-field>
-          <label>Name</label>
-          <md-input v-model="inputValue"></md-input>
-        </md-field>
 
-        <icon-component class="iconComponent"
-                        @selectIcon="selectIcon"
+      <md-field>
+        <label>Group name</label>
+        <md-input v-model="inputValue"></md-input>
+      </md-field>
+
+      <div class="iconComponent">
+        <icon-component @selectIcon="selectIcon"
                         :selected="iconSelected"></icon-component>
+      </div>
 
+      <div class="colorDiv">
         <chrome-picker v-model="color" />
       </div>
+
     </md-dialog-content>
 
     <md-dialog-actions>
@@ -54,7 +57,7 @@ with this file. If not, see
 
 <script>
 import iconComponent from "./iconsComponents.vue";
-import { Chrome } from "vue-color";
+import { Chrome, Photoshop } from "vue-color";
 import { groupManagerService } from "spinal-env-viewer-plugin-group-manager-service";
 import EventBus from "../../../js/event.js";
 
@@ -64,6 +67,7 @@ export default {
   components: {
     "chrome-picker": Chrome,
     "icon-component": iconComponent,
+    "photoshop-picker": Photoshop,
   },
   data() {
     this.edit;
@@ -84,12 +88,14 @@ export default {
       this.title = option.title;
       this.contextId = option.contextId;
       this.selectedNode = option.selectedNode.id.get();
-
+      this.iconSelected = "3d_rotation";
+      console.log("option", option);
       if (this.edit) {
         this.inputValue = option.selectedNode.name.get();
         this.color = option.color;
         this.iconSelected =
-          option.selectedNode.icon && option.selectedNode.icon.get();
+          (option.selectedNode.icon && option.selectedNode.icon.get()) ||
+          "3d_rotation";
       }
 
       if (option.callback) this.callback = option.callback;
@@ -98,7 +104,8 @@ export default {
     removed(closed) {
       if (closed) {
         this.createElement().then((result) => {
-          this.sentEvent(result.info.id.get());
+          const id = result.info ? result.info.id.get() : result.id.get();
+          this.sentEvent(id);
         });
       }
       this.showDialog = false;
@@ -155,7 +162,21 @@ export default {
 </script>
 
 <style scoped>
-.dialogContainer .iconComponent {
-  height: 300px;
+.dialogContainer {
+  /* width: 500px !important; */
+  /* height: 100% !important; */
 }
+.dialogContainer .iconComponent {
+  /* height: 50%; */
+  margin-bottom: 15px;
+}
+
+.dialogContainer .colorDiv {
+  /* height: 50%; */
+}
+
+/* .dialogContainer .colorDiv > * {
+  width: 100%;
+  height: 100%;
+} */
 </style>

@@ -1,7 +1,7 @@
 [
-
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "3d_rotation"
       },
       {
@@ -745,7 +745,8 @@
     "name": "action"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "add_alert"
       },
       {
@@ -764,7 +765,8 @@
     "name": "alert"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "4k"
       },
       {
@@ -1027,7 +1029,8 @@
     "name": "av"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "alternate_email"
       },
       {
@@ -1220,7 +1223,8 @@
     "name": "communication"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "add"
       },
       {
@@ -1375,7 +1379,8 @@
     "name": "content"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "access_alarm"
       },
       {
@@ -1628,7 +1633,8 @@
     "name": "device"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "add_comment"
       },
       {
@@ -1854,7 +1860,8 @@
     "name": "editor"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "attachment"
       },
       {
@@ -1894,7 +1901,8 @@
     "name": "file"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "cast"
       },
       {
@@ -2055,7 +2063,8 @@
     "name": "hardware"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "add_a_photo"
       },
       {
@@ -2536,7 +2545,8 @@
     "name": "image"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "360"
       },
       {
@@ -2777,7 +2787,8 @@
     "name": "maps"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "apps"
       },
       {
@@ -2874,7 +2885,8 @@
     "name": "navigation"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "adb"
       },
       {
@@ -3034,7 +3046,8 @@
     "name": "notification"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "ac_unit"
       },
       {
@@ -3101,7 +3114,8 @@
     "name": "places"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "cake"
       },
       {
@@ -3205,7 +3219,8 @@
     "name": "social"
   },
   {
-    "icons": [{
+    "icons": [
+      {
         "id": "check_box"
       },
       {
