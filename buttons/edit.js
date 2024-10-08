@@ -23,9 +23,7 @@ class Edit extends SpinalContextApp {
     const isCategory = groupManagerService.isCategory(selectedNodeType);
     const isGroup = groupManagerService.isGroup(selectedNodeType);
 
-    if (isContext && (isGroup || isCategory)) {
-      return Promise.resolve(true);
-    }
+    if (isContext && (isGroup || isCategory)) return Promise.resolve(true);
 
     return Promise.resolve(-1);
   }
@@ -41,13 +39,11 @@ class Edit extends SpinalContextApp {
     };
 
     if (groupManagerService.isGroup(type)) {
-      params["color"] = option.selectedNode.color ? option.selectedNode
-        .color.get() : "#000000";
+      params["color"] = option.selectedNode.color ? option.selectedNode.color.get() : "#000000";
       spinalPanelManagerService.openPanel("createGroupDialog", params);
 
     } else if (groupManagerService.isCategory(type)) {
-      params["iconSelected"] = option.selectedNode.icon ? option.selectedNode
-        .icon.get() : undefined;
+      params["iconSelected"] = option.selectedNode.icon ? option.selectedNode.icon.get() : undefined;
 
       spinalPanelManagerService.openPanel("createCategoryDialog", params);
     }

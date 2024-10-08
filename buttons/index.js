@@ -1,23 +1,13 @@
-import addBimObjectToGroup from "./addBimObjectToGroup";
-import addBimRoomToGroup from "./addBimRoomToGroup";
-import createContextGroup from "./createContextGroup";
-import createElement from "./createElement";
-import editBtn from "./edit";
-import findBimObject from "./findBimObject";
-import findBimRoom from "./findBimRoom";
-import linkRooms from "./linkRooms";
-import viewBtn from "./viewBtn";
+export * from "./addBimObjectToGroup";
+export * from "./addBimRoomToGroup";
+export * from "./createContextGroup";
+export * from "./createElement";
+export * from "./edit";
+export * from "./findBimObject";
+export * from "./findBimRoom";
+export * from "./linkRooms";
+export * from "./restoreGroupItemColor";
+export * from "./colorGroupItems";
+// export *  "./viewBtn";
 
 
-
-export {
-   addBimObjectToGroup,
-   addBimRoomToGroup,
-   createContextGroup,
-   createElement,
-   editBtn,
-   findBimObject,
-   findBimRoom,
-   linkRooms,
-   viewBtn
-}

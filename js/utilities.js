@@ -1,33 +1,11 @@
-import {
-  // ROOMS_CATEGORY_RELATION,
-  // ROOMS_GROUP_RELATION,
-  // ROOMS_TO_ELEMENT_RELATION,
-  // EQUIPMENTS_CATEGORY_RELATION,
-  // EQUIPMENTS_GROUP_RELATION,
-  // EQUIPMENTS_TO_ELEMENT_RELATION,
-  // ROOMS_GROUP_CONTEXT,
-  // ROOMS_GROUP,
-  // ROOMS_CATEGORY,
-  // EQUIPMENTS_GROUP_CONTEXT,
-  // EQUIPMENTS_CATEGORY,
-  // EQUIPMENTS_GROUP
-  groupService,
-} from "../services/service";
 import { SpinalGraphService } from "spinal-env-viewer-graph-service";
-
-import { BIM_OBJECT_TYPE } from "spinal-env-viewer-plugin-forge/dist/Constants";
-
 import geographicService from "spinal-env-viewer-context-geographic-service";
-
 import { groupManagerService } from "spinal-env-viewer-plugin-group-manager-service";
 
 let ItemColoredMap = new Map();
 let BimElementsColor = new Map();
 
 const ROOMS_RELATIONS = [
-  // groupService.constants.CATEGORY_TO_GROUP_RELATION,
-  // groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
-  // groupService.constants.GROUP_TO_ROOMS_RELATION,
   groupManagerService.constants.CATEGORY_TO_GROUP_RELATION,
   groupManagerService.constants.CONTEXT_TO_CATEGORY_RELATION,
   groupManagerService.constants.OLD_RELATIONS_TYPES.GROUP_TO_ROOMS_RELATION,
@@ -37,31 +15,31 @@ const ROOMS_RELATIONS = [
 ];
 
 const EQUIPMENTS_RELATIONS = [
-  // groupService.constants.CATEGORY_TO_GROUP_RELATION,
-  // groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
   groupManagerService.constants.CATEGORY_TO_GROUP_RELATION,
   groupManagerService.constants.CONTEXT_TO_CATEGORY_RELATION,
-  groupManagerService.constants.OLD_RELATIONS_TYPES
-    .GROUP_TO_EQUIPMENTS_RELATION,
+  groupManagerService.constants.OLD_RELATIONS_TYPES.GROUP_TO_EQUIPMENTS_RELATION,
   `groupHas${geographicService.constants.EQUIPMENT_TYPE}`,
+  geographicService.constants.REFERENCE_RELATION,
+  geographicService.constants.EQUIPMENT_RELATION,
+  `${geographicService.constants.REFERENCE_RELATION}.ROOM`
 ];
 
-const ROOMS_TYPES = [
-  groupManagerService.constants.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT,
-  groupManagerService.constants.CATEGORY_TYPE,
-  groupManagerService.constants.OLD_GROUPS_TYPES.ROOMS_GROUP,
-  `${geographicService.constants.ROOM_TYPE}GroupContext`,
-  `${geographicService.constants.ROOM_TYPE}Group`,
-];
+// const ROOMS_TYPES = [
+//   groupManagerService.constants.OLD_CONTEXTS_TYPES.ROOMS_GROUP_CONTEXT,
+//   groupManagerService.constants.CATEGORY_TYPE,
+//   groupManagerService.constants.OLD_GROUPS_TYPES.ROOMS_GROUP,
+//   `${geographicService.constants.ROOM_TYPE}GroupContext`,
+//   `${geographicService.constants.ROOM_TYPE}Group`,
+// ];
 
-// eslint-disable-next-line no-unused-vars
-const EQUIPMENTS_TYPES = [
-  groupManagerService.constants.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT,
-  groupManagerService.constants.CATEGORY_TYPE,
-  groupManagerService.constants.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP,
-  `${geographicService.constants.EQUIPMENT_TYPE}GroupContext`,
-  `${geographicService.constants.EQUIPMENT_TYPE}Group`,
-];
+// // eslint-disable-next-line no-unused-vars
+// const EQUIPMENTS_TYPES = [
+//   groupManagerService.constants.OLD_CONTEXTS_TYPES.EQUIPMENTS_GROUP_CONTEXT,
+//   groupManagerService.constants.CATEGORY_TYPE,
+//   groupManagerService.constants.OLD_GROUPS_TYPES.EQUIPMENTS_GROUP,
+//   `${geographicService.constants.EQUIPMENT_TYPE}GroupContext`,
+//   `${geographicService.constants.EQUIPMENT_TYPE}Group`,
+// ];
 
 let utilities = {
   getIcon(selectedNode) {
@@ -70,67 +48,95 @@ let utilities = {
     });
   },
 
-  getBimObjects(nodeId) {
-    let nodeInfo = SpinalGraphService.getInfo(nodeId);
-    let type = nodeInfo.type.get();
+  async getGroupBimObjects(groupId) {
+    const groupInfo = SpinalGraphService.getInfo(groupId);
 
-    if (type === BIM_OBJECT_TYPE) {
-      return Promise.resolve([nodeInfo]);
-    } else if (type === geographicService.constants.ROOM_TYPE) {
-      return SpinalGraphService.getChildren(nodeId, [
-        geographicService.constants.REFERENCE_RELATION,
-        geographicService.constants.EQUIPMENT_RELATION,
-      ]);
-    } else {
-      let relations = [
-        groupService.constants.CONTEXT_TO_CATEGORY_RELATION,
-        groupService.constants.GROUP_TO_ROOMS_RELATION,
-        geographicService.constants.REFERENCE_RELATION,
-        geographicService.constants.EQUIPMENT_RELATION,
-        groupService.constants.CATEGORY_TO_GROUP_RELATION,
-        groupService.constants.GROUP_TO_EQUIPMENTS_RELATION,
-      ];
 
-      if (ROOMS_TYPES.indexOf(type) !== -1) {
-        relations = ROOMS_RELATIONS;
-      } else {
-        relations = EQUIPMENTS_RELATIONS;
-      }
+    if (groupManagerService.isRoomsGroup(groupInfo.type.get())) {
+      const rooms = await SpinalGraphService.getChildren(groupId, ROOMS_RELATIONS);
+      const promises = rooms.map((el) => SpinalGraphService.getChildren(el.id.get(), EQUIPMENTS_RELATIONS));
 
-      return SpinalGraphService.findNodes(nodeId, relations, (node) => {
-        return node.getType().get() === BIM_OBJECT_TYPE;
-      }).then((res) => {
-        return res.map((el) => {
-          SpinalGraphService._addNode(el);
-          return el.info;
-        });
+      return Promise.all(promises).then((res) => {
+        console.log("res equip", res);
+        return res.flat()
       });
     }
+
+    if (groupManagerService.isEquipmentsGroup(groupInfo.type.get())) {
+      return SpinalGraphService.getChildren(groupId, EQUIPMENTS_RELATIONS);
+    }
+
+    return [];
+
+
+
+
+
+    // let nodeInfo = SpinalGraphService.getInfo(nodeId);
+    // let type = nodeInfo.type.get();
+
+    // if (type === BIM_OBJECT_TYPE) return Promise.resolve([nodeInfo]);
+
+    // if (type === geographicService.constants.ROOM_TYPE) {
+    //   const { REFERENCE_RELATION, EQUIPMENT_RELATION } = geographicService.constants;
+    //   const relations = [REFERENCE_RELATION, EQUIPMENT_RELATION];
+    //   return SpinalGraphService.getChildren(nodeId, relations);
+    // }
+
+    // let relations = ROOMS_TYPES.includes(type) ? ROOMS_RELATIONS : EQUIPMENTS_RELATIONS;
+
+    // const predicate = (node) => node.getType().get() === BIM_OBJECT_TYPE;
+
+    // const node = SpinalGraphService.getRealNode(nodeId);
+
+    // const found = [];
+
+
+
+    // return SpinalGraphService.findNodes(nodeId, relations, (node) => {
+    //   return node.getType().get() === BIM_OBJECT_TYPE;
+    // }).then((res) => {
+    //   return res.map((el) => {
+    //     SpinalGraphService._addNode(el);
+    //     return el.info;
+    //   });
+    // });
+
   },
 
   getGroups(selectedNode) {
-    let type = selectedNode.type.get();
-    let nodeId = selectedNode.id.get();
-
-    if (groupManagerService.isGroup(type)) {
-      return Promise.resolve([selectedNode]);
+    try {
+      return groupManagerService.getGroups(selectedNode.id.get());
+    } catch (error) {
+      console.error("getGroups error");
+      console.error(error);
     }
 
-    let relations = [];
+    // let type = selectedNode.type.get();
+    // let nodeId = selectedNode.id.get();
 
-    return SpinalGraphService.findNodes(nodeId, relations, (node) => {
-      let argType = node.getType().get();
-      return groupManagerService.isGroup(argType);
-    }).then((res) => {
-      return res.map((el) => {
-        SpinalGraphService._addNode(el);
-        return el.info;
-      });
-    });
+    // if (groupManagerService.isGroup(type)) {
+    //   return Promise.resolve([selectedNode]);
+    // }
+
+    // if (groupManagerService.isCategory(type)) groupManagerService.getGroups(nodeId);
+
+    // let relations = [];
+
+    // return SpinalGraphService.findNodes(nodeId, relations, (node) => {
+    //   let argType = node.getType().get();
+    //   return groupManagerService.isGroup(argType);
+    // }).then((res) => {
+    //   return res.map((el) => {
+    //     SpinalGraphService._addNode(el);
+    //     return el.info;
+    //   });
+    // });
   },
 
   colorItem(selectedNode) {
     this.getGroups(selectedNode).then((res) => {
+
       res.forEach((el) => {
         let id = el.id.get();
         let color = el.color ? el.color.get() : undefined;
@@ -149,84 +155,50 @@ let utilities = {
   },
 
   colorGroup(groupId, argColor) {
-    this.getBimObjects(groupId).then((res) => {
-      let color =
-        typeof argColor !== "undefined"
-          ? this._convertHexColorToRGB(argColor)
-          : this._convertHexColorToRGB("#000000");
+    this.getGroupBimObjects(groupId).then((res) => {
+      console.log("res", res);
+      let color = argColor ? this._convertHexColorToRGB(argColor) : this._convertHexColorToRGB("#000000");
 
       ItemColoredMap.set(groupId, groupId);
 
-      res.forEach((child) => {
-        let BimColors = BimElementsColor.get(child.dbid.get())
-          ? BimElementsColor.get(child.dbid.get())
-          : [];
+      for (const child of res) {
+        const dbId = child.dbid.get();
+        let BimColors = BimElementsColor.get(dbId) || [];
+        BimColors.push({ id: groupId, color: color });
+        BimElementsColor.set(dbId, BimColors);
 
-        BimColors.push({
-          id: groupId, //node.id.get(),
-          color: color,
-        });
+        let model = window.spinal.BimObjectService.getModelByBimfile(child.bimFileId.get());
+        console.log(model);
+        if (model) {
+          model.setThemingColor(dbId, new THREE.Vector4(color.r / 255, color.g / 255, color.b / 255, 0.7, true));
+        }
+      }
 
-        BimElementsColor.set(child.dbid.get(), BimColors);
-
-        let model = window.spinal.BimObjectService.getModelByBimfile(
-          child.bimFileId.get()
-        );
-
-        console.log("model", model);
-
-        model.setThemingColor(
-          child.dbid.get(),
-          new THREE.Vector4(
-            color.r / 255,
-            color.g / 255,
-            color.b / 255,
-            0.7,
-            true
-          )
-        );
-      });
     });
   },
 
   restoreGroup(groupId) {
-    ItemColoredMap.delete(groupId);
-    this.getBimObjects(groupId).then((res) => {
-      res.forEach((child) => {
-        let model = window.spinal.BimObjectService.getModelByBimfile(
-          child.bimFileId.get()
-        );
+    this.getGroupBimObjects(groupId).then((res) => {
+      ItemColoredMap.delete(groupId);
 
-        model.setThemingColor(
-          child.dbid.get(),
-          // eslint-disable-next-line no-undef
-          new THREE.Vector4(0, 0, 0, 0),
-          true
-        );
+      for (const child of res) {
+        const dbId = child.dbid.get();
+        let model = window.spinal.BimObjectService.getModelByBimfile(child.bimFileId.get());
+        model.setThemingColor(dbId, new THREE.Vector4(0, 0, 0, 0), true);
 
-        let allColors = BimElementsColor.get(child.dbid.get());
+        let allColors = BimElementsColor.get(dbId);
+        if (!allColors) continue;
 
-        if (allColors) {
-          //   allColors = allColors.filter(el => el.id !== node.id.get());
-          allColors = allColors.filter((el) => el.id !== groupId);
-          BimElementsColor.set(child.dbid.get(), allColors);
+        allColors = allColors.filter((el) => el.id !== groupId);
+        BimElementsColor.set(dbId, allColors);
 
-          if (allColors.length > 0) {
-            let color = allColors[0].color;
-            model.setThemingColor(
-              child.dbid.get(),
-              // eslint-disable-next-line no-undef
-              new THREE.Vector4(
-                color.r / 255,
-                color.g / 255,
-                color.b / 255,
-                0.7
-              ),
-              true
-            );
-          }
+        if (allColors.length > 0) {
+          let color = allColors[0].color;
+          model.setThemingColor(dbId, new THREE.Vector4(color.r / 255, color.g / 255, color.b / 255, 0.7), true);
         }
-      });
+
+      }
+
     });
   },
 
@@ -237,8 +209,6 @@ let utilities = {
       let endIndex = index + batchSize;
       if (promises.length <= endIndex) endIndex = promises.length;
       const slice = promises.slice(index, endIndex);
-      // const resProm = await Promise.all(slice.map((e) => e()));
-      // result.push(...resProm);
       const { successed, failed } = await this.getPromiseResult(
         slice.map((e) => e())
       );
@@ -285,10 +255,10 @@ let utilities = {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
       ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16),
-        }
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
       : null;
   },
 
@@ -296,36 +266,29 @@ let utilities = {
   //                                    Parcours ascendant                                 //
   ///////////////////////////////////////////////////////////////////////////////////////////
 
-  async getGeographicTree(endNodeId) {
-    let obj = {
-      id: endNodeId,
-      children: [],
-    };
+  // async getGeographicTree(endNodeId) {
+  //   let obj = {
+  //     id: endNodeId,
+  //     children: [],
+  //   };
 
-    let parents = [];
+  //   let parents = [];
 
-    do {
-      let tempParents = await SpinalGraphService.getParents(
-        id,
-        geographicService.constants.GEOGRAPHIC_RELATIONS
-      );
+  //   do {
+  //     let tempParents = await SpinalGraphService.getParents(id, geographicService.constants.GEOGRAPHIC_RELATIONS);
 
-      parents = tempParents && tempParents.map((el) => el.get());
+  //     parents = tempParents && tempParents.map((el) => el.get());
 
-      // parent && result.push(parent.get());
+  //   } while (parents.length);
 
-      // id = (parent && parent.id) && parent.id.get();
-    } while (parents.length);
+  // },
 
-    // return result;
-  },
-
-  addObjToParent(obj, parentId) {
-    return {
-      id: parentId,
-      children: obj,
-    };
-  },
+  // addObjToParent(obj, parentId) {
+  //   return {
+  //     id: parentId,
+  //     children: obj,
+  //   };
+  // },
 };
 
 export default utilities;

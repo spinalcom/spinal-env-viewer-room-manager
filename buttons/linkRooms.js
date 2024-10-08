@@ -8,7 +8,7 @@ const SIDEBAR = "GraphManagerSideBar";
 
 class LinkRooms extends SpinalContextApp {
   constructor() {
-    super("link Rooms", "This button allows to link rooms to space", {
+    super("link Rooms", "This button allows to link rooms to Group", {
       icon: "settings_input_component",
       icon_type: "in",
       backgroundColor: "#FF0000",

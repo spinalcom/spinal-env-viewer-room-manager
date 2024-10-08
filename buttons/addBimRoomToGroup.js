@@ -12,11 +12,11 @@ class AddRoomToGroup extends SpinalContextApp {
   constructor() {
     super("add room to group",
       "add room which linked to this object to group", {
-        icon: 'playlist_add',
-        icon_type: 'in',
-        backgroundColor: '#356BAB',
-        fontColor: '#FFFFFF'
-      })
+      icon: 'playlist_add',
+      icon_type: 'in',
+      backgroundColor: '#356BAB',
+      fontColor: '#FFFFFF'
+    })
   }
 
   async isShown(option) {
@@ -50,9 +50,7 @@ const getRoom = async (option) => {
 
     const realNode = SpinalGraphService.getRealNode(id);
 
-    let parents = await realNode.getParents([EQUIPMENT_RELATION,
-      REFERENCE_RELATION
-    ]);
+    let parents = await realNode.getParents([EQUIPMENT_RELATION, REFERENCE_RELATION]);
 
     if (!parents || (parents && parents.length === 0)) return;
 

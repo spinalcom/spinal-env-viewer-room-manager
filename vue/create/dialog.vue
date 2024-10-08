@@ -23,9 +23,8 @@ with this file. If not, see
 -->
 
 <template>
-  <md-dialog :md-active.sync="showDialog"
-             @md-closed="closeDialog(false)">
-    <md-dialog-title>{{title | toUpperCase}}</md-dialog-title>
+  <md-dialog :md-active.sync="showDialog" @md-closed="closeDialog(false)">
+    <md-dialog-title>{{ title | toUpperCase }}</md-dialog-title>
 
     <md-dialog-content class="dialogContainer">
       <div v-if="type === 'context'">
@@ -37,11 +36,8 @@ with this file. If not, see
         <div>
           <span class="md-title">Choose :</span>
 
-          <md-radio class="md-primary"
-                    v-for="(t, index) in GroupTypes"
-                    :key="index"
-                    v-model="typeSelected"
-                    :value="t.type">{{ t.name }}</md-radio>
+          <md-radio class="md-primary" v-for="(t, index) in GroupTypes" :key="index" v-model="typeSelected"
+            :value="t.type">{{ t.name }}</md-radio>
         </div>
 
       </div>
@@ -52,23 +48,17 @@ with this file. If not, see
           <md-input v-model="inputValue"></md-input>
         </md-field>
 
-        <icon-component @selectIcon="selectIcon"
-                        :selected="iconSelected"
-                        v-if="isCategory()"></icon-component>
+        <icon-component @selectIcon="selectIcon" :selected="iconSelected" v-if="isCategory()"></icon-component>
 
-        <chrome-picker v-if="isGroup()"
-                       v-model="color" />
+        <chrome-picker v-if="isGroup()" v-model="color" />
 
       </div>
 
     </md-dialog-content>
 
     <md-dialog-actions>
-      <md-button class="md-primary"
-                 @click="closeDialog(false)">Close</md-button>
-      <md-button class="md-primary"
-                 @click="closeDialog(true)"
-                 :disabled="isDisabled()">Save</md-button>
+      <md-button class="md-primary" @click="closeDialog(false)">Close</md-button>
+      <md-button class="md-primary" @click="closeDialog(true)" :disabled="isDisabled()">Save</md-button>
     </md-dialog-actions>
   </md-dialog>
 </template>
@@ -133,7 +123,7 @@ export default {
       typeSelected: groupService.constants.ROOMS_GROUP_CONTEXT,
       parent: undefined,
       contextId: null,
-      callback: () => {}
+      callback: () => { }
     };
   },
 
@@ -170,11 +160,8 @@ export default {
         let value = this.inputValue.trim();
 
         if (typeof this.parent === "undefined") {
-          groupService
-            .createGroupContext(value, this.typeSelected)
-            .then(_res => {
-              this.sentEvent(_res.info.id.get());
-            });
+          groupService.createGroupContext(value, this.typeSelected)
+            .then(_res => this.sentEvent(_res.info.id.get()));
         } else if (typeof this.hide === "undefined") {
           if (typeof this.edit === "undefined") {
             let type = this.parent.type.get();
@@ -456,7 +443,7 @@ export default {
     }
   },
   filters: {
-    toUpperCase: function(data) {
+    toUpperCase: function (data) {
       return data.toUpperCase();
     }
   }
