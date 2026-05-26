@@ -23,15 +23,15 @@ with this file. If not, see
 -->
 
 <template>
-
   <div>
-    <md-autocomplete v-model="iconSelected"
-                     :md-options="icons"
-                     @md-changed="getIcons"
-                     @md-opened="getIcons">
+    <md-autocomplete
+      v-model="iconSelected"
+      :md-options="icons"
+      @md-changed="getIcons"
+      @md-opened="getIcons"
+    >
       <label>Icon</label>
-      <template slot="md-autocomplete-item"
-                slot-scope="{ item }">
+      <template slot="md-autocomplete-item" slot-scope="{ item }">
         <div>
           <md-icon>{{ item }}</md-icon>
           &nbsp; &nbsp;
@@ -81,10 +81,10 @@ with this file. If not, see
 </template>
 
 <script>
-import allIcons from "../../../js/icons.json";
+import allIcons from '../../../js/icons.json';
 
 export default {
-  name: "iconComponent",
+  name: 'iconComponent',
   props: {
     selected: {
       type: String,
@@ -96,19 +96,19 @@ export default {
     return {
       iconsDisplayed: Object.values(allIcons),
       iconSelected: null,
-      categorySelected: "none",
+      categorySelected: 'none',
       icons: [],
     };
   },
   mounted() {
-    if (typeof this.selected !== "undefined") {
+    if (typeof this.selected !== 'undefined') {
       this.iconSelected = this.selected;
     }
   },
   methods: {
     filterIcons() {
       let category =
-        this.categorySelected !== "none" ? this.categorySelected : undefined;
+        this.categorySelected !== 'none' ? this.categorySelected : undefined;
       this.iconsDisplayed = this.getIconsByCategory(category);
     },
     getAllCategories() {
@@ -116,9 +116,9 @@ export default {
     },
 
     getIconsByCategory(categoryName) {
-      if (typeof categoryName !== "undefined") {
+      if (typeof categoryName !== 'undefined') {
         let category = this.allIcons.find((el) => el.name === categoryName);
-        if (typeof category !== "undefined") {
+        if (typeof category !== 'undefined') {
           return [category];
         }
       } else {
@@ -130,7 +130,7 @@ export default {
 
     selectIcon(icon) {
       this.iconSelected = icon;
-      this.$emit("selectIcon", icon);
+      this.$emit('selectIcon', icon);
     },
 
     isSelected(icon) {
@@ -167,6 +167,9 @@ export default {
     },
     selected() {
       this.iconSelected = this.selected;
+    },
+    iconSelected() {
+      this.$emit('selectIcon', this.iconSelected);
     },
   },
 };

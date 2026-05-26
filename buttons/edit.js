@@ -35,16 +35,14 @@ class Edit extends SpinalContextApp {
       edit: true,
       title: `Edit ${option.selectedNode.name.get()}`,
       contextId: option.context.id.get(),
-      selectedNode: option.selectedNode
+      selectedNode: option.selectedNode,
+      iconSelected: option.selectedNode.icon ? option.selectedNode.icon.get() : undefined
     };
 
     if (groupManagerService.isGroup(type)) {
       params["color"] = option.selectedNode.color ? option.selectedNode.color.get() : "#000000";
       spinalPanelManagerService.openPanel("createGroupDialog", params);
-
     } else if (groupManagerService.isCategory(type)) {
-      params["iconSelected"] = option.selectedNode.icon ? option.selectedNode.icon.get() : undefined;
-
       spinalPanelManagerService.openPanel("createCategoryDialog", params);
     }
 
