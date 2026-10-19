@@ -124,26 +124,39 @@ with this file. If not, see
 
 			removed(option) {
 				if (option) {
-					this.items.forEach((el) => {
-						attributeService.linkItem(
-							this.contextSelected,
-							this.groupSelected,
-							el.id
-						);
-					});
+					// { itemId, result: { old_group, newGroup } } or { itemId, error }
+					const linkResults = Promise.all(
+						this.items.map((el) =>
+							attributeService
+								.linkItem(this.contextSelected, this.groupSelected, el.id)
+								.then(
+									(result) => ({ itemId: el.id, result }),
+									(error) => ({ itemId: el.id, error })
+								)
+						)
+					);
+
+					const context = this.data.find(
+						(el) => el.id === this.contextSelected
+					);
+					const category = this.categories.find(
+						(el) => el.id === this.categorySelected
+					);
+					const group = this.groups.find(
+						(el) => el.id === this.groupSelected
+					);
 
 					if (typeof this.callback !== "undefined") {
-						const context = this.data.find(
-							(el) => el.id === this.contextSelected
-						);
-						const category = this.categories.find(
-							(el) => el.id === this.categorySelected
-						);
-						const group = this.groups.find(
-							(el) => el.id === this.groupSelected
-						);
-
 						this.callback(context, category, group);
+					}
+
+					if (this.items.length > 0) {
+						spinalPanelManagerService.openPanel("linkToGroupSummaryDialog", {
+							items: this.items,
+							linkResults,
+							category,
+							group,
+						});
 					}
 				}
 				this.showDialog = false;

@@ -9,6 +9,7 @@ import createCategoryDialog from "./create/createCategory.vue";
 import createGroupDialog from "./create/createGroup.vue";
 import colorConfigDialog from "./color/colorDialog.vue";
 import LinkToGroup from "./linkToGroup/linkToGroup.vue";
+import LinkToGroupSummary from "./linkToGroup/linkToGroupSummary.vue";
 import SelectGroupTypeDialog from "./selectTypeDialog.vue";
 import AddBimObjectToGroupDialog from "./linkToGroup/linkBimObjectToGroup.vue";
 
@@ -16,6 +17,11 @@ const dialogs = [
   {
     name: "linkToGroupDialog",
     vueMountComponent: vue.extend(LinkToGroup),
+    parentContainer: document.body,
+  },
+  {
+    name: "linkToGroupSummaryDialog",
+    vueMountComponent: vue.extend(LinkToGroupSummary),
     parentContainer: document.body,
   },
   {
